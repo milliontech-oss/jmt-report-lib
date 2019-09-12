@@ -1,0 +1,115 @@
+apply plugin: 'java'
+apply plugin: 'java-library'
+apply plugin: 'eclipse'
+apply plugin: 'project-report' // use `gradlew htmlDependencyReport` to view the graphs
+apply plugin: 'maven-publish'
+
+eclipse {
+    classpath{
+        file {
+            whenMerged { classpath ->
+                def paths = [
+                    'src/main/java' : 'build/classes/java/main',
+                    'src/test/java' : 'build/classes/java/test',
+                    'src/main/resources': 'build/resources/main'
+                ]
+                classpath.entries.each {
+                    def p = paths[it.path]
+                    if(p) it.output = p
+                }
+            }
+        }
+    }
+}
+
+
+
+sourceCompatibility = 1.8
+
+println "Gradle Version: ${project.getGradle().getGradleVersion().toString()}"
+
+repositories {
+    //mavenCentral()
+    maven {
+        url 'https://int.milliontech.com/mtnexus/repository/maven-public/'
+    }
+}
+
+publishing {
+    repositories {
+        mavenLocal()
+        maven {
+            name 'MTsnapshots'
+            url 'https://int.milliontech.com/mtnexus/repository/maven-snapshots/'
+        }
+    }
+
+    publications {
+        core(MavenPublication) {
+            group = 'com.milliontech'
+            artifactId = 'jmt-report-lib'
+            version = '4.0.0'
+            from components.java
+        }
+    }
+}
+
+def apachePOIVersion = '4.1.0'
+def slf4jVersion = '1.7.26'
+
+java {
+    registerFeature("csvSupport") {
+        usingSourceSet(sourceSets.main)
+    }
+}
+
+
+dependencies {
+    // slf4j
+    api("org.slf4j:slf4j-api:${slf4jVersion}");
+
+    //Report
+    api("org.apache.poi:poi:${apachePOIVersion}")
+    api("org.apache.poi:poi-ooxml:${apachePOIVersion}")
+    api("org.apache.poi:poi-ooxml-schemas:${apachePOIVersion}")
+
+    // for OOXML writing
+    implementation('xerces:xercesImpl:2.12.0');
+    implementation('xalan:xalan:2.7.2');
+    implementation('xalan:serializer:2.7.2');
+    implementation('xml-resolver:xml-resolver:1.2');
+
+    api('com.itextpdf:itextpdf:5.5.13')
+    api('com.itextpdf:itext-pdfa:5.5.13')
+    api('com.itextpdf:itext-asian:5.2.0')
+
+    csvSupportApi('net.sf.supercsv:super-csv:2.4.0')
+
+    api('org.jodd:jodd-bean:5.0.6')
+    api('org.apache.commons:commons-lang3:3.9')
+    api('org.apache.commons:commons-collections4:4.4')
+    api('commons-io:commons-io:2.6')
+
+    // Use JUnit test framework
+    testImplementation('junit:junit:4.12')
+    testImplementation('ch.qos.logback:logback-classic:1.2.3')
+}
+
+
+def listrepos = {
+    println "~~~~ listing repositories ~~~~"
+    project.repositories.each { println "  Name: ${it.name} =>  url: ${it.url}" }
+    println "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+}
+listrepos()
+
+gradle.projectsEvaluated {
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+        options.compilerArgs << '-parameters'
+        doFirst {
+            println "current JVM = ${System.properties['java.vendor']} (${System.properties['java.version']}) (${System.properties['java.home']})"
+            println "javac compiler flags => $options.allCompilerArgs"
+        }
+    }
+}
