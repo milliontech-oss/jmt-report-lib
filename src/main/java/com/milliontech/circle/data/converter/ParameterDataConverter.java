@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ public class ParameterDataConverter {
 		}
 		
 		data = new ParameterData();
-		data.setAuthorName((String)parameter.get(ParameterDataConstants.AUTHOR_NAME));
+		data.setAuthorName(StringUtils.defaultIfEmpty((String)parameter.get(ParameterDataConstants.AUTHOR_NAME), "MT"));
 		
 		if (parameter.get(ParameterDataConstants.PRINT_DATE) != null) {
 		    data.setPrintDate((java.util.Date)parameter.get(ParameterDataConstants.PRINT_DATE));

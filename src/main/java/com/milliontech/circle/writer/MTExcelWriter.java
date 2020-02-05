@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.math3.util.MathUtils;
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hssf.usermodel.HSSFHeader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -175,8 +176,11 @@ public class MTExcelWriter implements MTWriter{
 		this.SUMMARY_CELL_LEFT_STYLE = ExcelHelper.createSummaryCellStyle(wb, data, setting, Constants.ALIGN_LEFT, false);
 		this.SUMMARY_CELL_RIGHT_STYLE = ExcelHelper.createSummaryCellStyle(wb, data, setting, Constants.ALIGN_RIGHT, false);
 		this.format = wb.createDataFormat();
+		
 		if(this.wb instanceof HSSFWorkbook){
-			ExcelHelper.resetColorPalette((HSSFWorkbook)wb);
+		    HSSFWorkbook hwb = (HSSFWorkbook)wb;
+			ExcelHelper.resetColorPalette(hwb);
+			hwb.createInformationProperties();
 		}
 	}
 
@@ -321,9 +325,7 @@ public class MTExcelWriter implements MTWriter{
 			int criPerRow = 3;
 			int colPerCri = 3;
             
-			int seperatorNumOfColumns = 
-			    criteriaList.size() >= criPerRow ? criPerRow * colPerCri :
-			    criteriaList.size() * colPerCri >= numOfColumns ? criteriaList.size() * colPerCri : numOfColumns;
+			int seperatorNumOfColumns = Math.max(criPerRow * colPerCri, numOfColumns);
 			
             rowNo = ExcelHelper.createSeperatorRow(rowNo, sheet, seperatorNumOfColumns, SEPERATOR_STYLE);
             
