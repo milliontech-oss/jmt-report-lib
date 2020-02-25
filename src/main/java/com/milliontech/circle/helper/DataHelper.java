@@ -3,6 +3,7 @@ package com.milliontech.circle.helper;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
@@ -33,6 +34,14 @@ public class DataHelper {
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat(format,Locale.ENGLISH);
 		return sdf.format(d);
+	}
+
+	public static String formatDate(java.time.LocalDate d, String format) {
+		if (d == null) {
+			return "";
+		}
+
+		return d.format(DateTimeFormatter.ofPattern(format));
 	}
 
 	public static String formatTimestamp(Timestamp d, String format){

@@ -39,8 +39,10 @@ publishing {
     repositories {
         mavenLocal()
         maven {
-            name 'MTsnapshots'
-            url 'https://int.milliontech.com/mtnexus/repository/maven-snapshots/'
+            name 'MT'
+            def releasesRepoUrl = 'https://int.milliontech.com/mtnexus/repository/MT/'
+            def snapshotsRepoUrl = 'https://int.milliontech.com/mtnexus/repository/maven-snapshots/'
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
         }
     }
 
@@ -48,7 +50,7 @@ publishing {
         core(MavenPublication) {
             group = 'com.milliontech'
             artifactId = 'jmt-report-lib'
-            version = '4.0.1'
+            version = '4.0.2'
             from components.java
         }
     }

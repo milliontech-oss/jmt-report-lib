@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
@@ -102,6 +103,9 @@ public class ExcelHelper {
             } else {
                 cell.setCellValue(d);
             }
+		}else if(value instanceof java.time.LocalDate){
+			java.time.LocalDate d = (java.time.LocalDate)value;
+			cell.setCellValue(java.util.Date.from(d.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
 		}else if(value instanceof Timestamp){
 			Timestamp t = (Timestamp)value;
             String excelCellFormat = cell.getCellStyle().getDataFormatString();

@@ -124,52 +124,58 @@ public class PdfHelper {
 	}
 
 	public static String getCellStringValue(Object value, String format) throws Exception{
+		String textValue;
 		if(value==null){
-			value = "";
+			textValue = "";
 		}else if(value instanceof java.util.Date){
 			Date d = (Date)value;
-			value = format != null? DataHelper.formatDate(d, format) : DataHelper.formatDate(d, Constants.DEFAULT_DATE_FORMAT);
+			textValue = format != null? DataHelper.formatDate(d, format) : DataHelper.formatDate(d, Constants.DEFAULT_DATE_FORMAT);
 		}else if(value instanceof java.sql.Date){
 			java.sql.Date d = (java.sql.Date)value;
-			value = format != null? DataHelper.formatDate(d, format) : DataHelper.formatDate(d, Constants.DEFAULT_DATE_FORMAT);
+			textValue = format != null? DataHelper.formatDate(d, format) : DataHelper.formatDate(d, Constants.DEFAULT_DATE_FORMAT);
+		}else if(value instanceof java.time.LocalDate){
+			java.time.LocalDate d = (java.time.LocalDate) value;
+			textValue = format != null ? DataHelper.formatDate(d, format) : DataHelper.formatDate(d, Constants.DEFAULT_DATE_FORMAT);
 		}else if(value instanceof Timestamp){
 			Timestamp t = (Timestamp)value;
-			value = format != null? DataHelper.formatDate(t, format) : DataHelper.formatDate(t, Constants.DEFAULT_TIMESTAMP_FORMAT);
+			textValue = format != null? DataHelper.formatDate(t, format) : DataHelper.formatDate(t, Constants.DEFAULT_TIMESTAMP_FORMAT);
 		}else if(value instanceof Instant){
 		    Instant i = (Instant)value;
-		    value = format != null? DataHelper.formatInstant(i, format) : DataHelper.formatInstant(i, Constants.DEFAULT_TIMESTAMP_FORMAT);
+		    textValue = format != null? DataHelper.formatInstant(i, format) : DataHelper.formatInstant(i, Constants.DEFAULT_TIMESTAMP_FORMAT);
 		}else if(value instanceof BigDecimal){
 			BigDecimal b = (BigDecimal)value;
 			if(format!=null){
 				DecimalFormat df = new DecimalFormat(format);
-				value = df.format(b.doubleValue());
+				textValue = df.format(b.doubleValue());
 			}else{
-				value = b.toString();
+				textValue = b.toString();
 			}
 		}else if(value instanceof Integer){
 			if(format!=null){
 				DecimalFormat df = new DecimalFormat(format);
-				value = df.format(value);
+				textValue = df.format(value);
 			}else{
-				value = String.valueOf(value);
+				textValue = String.valueOf(value);
 			}
 		}else if(value instanceof Long){
 			if(format!=null){
 				DecimalFormat df = new DecimalFormat(format);
-				value = df.format(value);
+				textValue = df.format(value);
 			}else{
-				value = String.valueOf(value);
+				textValue = String.valueOf(value);
 			}
 		}else if(value instanceof Double){
 			if(format!=null){
 				DecimalFormat df = new DecimalFormat(format);
-				value = df.format(value);
+				textValue = df.format(value);
 			}else{
-				value = String.valueOf(value);
+				textValue = String.valueOf(value);
 			}
-		}
+		}else{
+		    textValue = value.toString();
+        }
 
-		return (String)value;
+		return textValue;
 	}
 
 	public static Paragraph createDisplayParagraph(String value, Font font[], boolean underLine) {
