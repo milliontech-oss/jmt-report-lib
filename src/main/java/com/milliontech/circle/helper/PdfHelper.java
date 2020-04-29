@@ -1,11 +1,11 @@
 package com.milliontech.circle.helper;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -14,12 +14,10 @@ import org.apache.commons.lang3.reflect.MethodUtils;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.FontSelector;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
@@ -181,11 +179,11 @@ public class PdfHelper {
 		return textValue;
 	}
 
-	public static Paragraph createDisplayParagraph(String value, Font font[], boolean underLine) {
-		return PdfHelper.createDisplayParagraph(value, font, underLine, null);
+	public static Paragraph createDisplayParagraph(String value, List<Font> fonts, boolean underLine) {
+		return PdfHelper.createDisplayParagraph(value, fonts, underLine, null);
 	}
 	
-	public static Paragraph createDisplayParagraph(String value, Font fonts[], boolean underLine, TableHeader header) {
+	public static Paragraph createDisplayParagraph(String value, List<Font> fonts, boolean underLine, TableHeader header) {
         if (StringUtils.isBlank(value)) {
             return new Paragraph(new Chunk());
         }
@@ -247,83 +245,6 @@ public class PdfHelper {
 			}
 		}
 		return new Document();
-	}
-
-
-	//Pdf Style
-	public static Font[] createFontArray() throws DocumentException, IOException{
-		Font[] fontArray = new Font[5];
-		fontArray[0] = new Font(BaseFont.createFont("MHei-Medium", "UniCNS-UCS2-H", BaseFont.NOT_EMBEDDED));
-		fontArray[1] = new Font(BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED));
-		fontArray[2] = new Font(BaseFont.createFont("HeiseiMin-W3", "UniJIS-UCS2-H", BaseFont.NOT_EMBEDDED));
-		fontArray[3] = new Font(BaseFont.createFont("HYGoThic-Medium", "UniKS-UCS2-H", BaseFont.NOT_EMBEDDED));
-		fontArray[4] = new Font(BaseFont.createFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED));
-		return fontArray;
-	}
-
-	public static PdfStyle createHeaderFooterStyle(ParameterData data, ReportSetting setting) throws DocumentException, IOException{
-		PdfStyle style = new PdfStyle();
-		Font[] fontArray = createFontArray();
-		for (int i = 0; i < fontArray.length; i++) {
-			Font f = fontArray[i];
-			f.setSize(8);
-			f.setStyle(Font.NORMAL);
-		}
-		style.setFontList(fontArray);
-		return style;
-	}
-
-	public static PdfStyle createCriteriaStyle(ParameterData data, ReportSetting setting) throws DocumentException, IOException{
-		PdfStyle style = new PdfStyle();
-		Font[] fontArray = createFontArray();
-		for (int i = 0; i < fontArray.length; i++) {
-			Font f = fontArray[i];
-			float fontSize = data.getFontSizeCriteria()!=null ?  data.getFontSizeCriteria().floatValue() : PdfConstants.DEFAULT_CRITERIA_FONT_SIZE;
-			f.setSize(fontSize);
-			f.setStyle(Font.NORMAL);
-		}
-		style.setFontList(fontArray);
-		return style;
-	}
-
-	public static PdfStyle createHeaderTitleStyle(ParameterData data, ReportSetting setting) throws DocumentException, IOException{
-		PdfStyle style = new PdfStyle();
-		Font[] fontArray = createFontArray();
-		for (int i = 0; i < fontArray.length; i++) {
-			Font f = fontArray[i];
-			float fontSize = data.getFontSizeTitle()!=null ? data.getFontSizeTitle().floatValue() :
-						PdfConstants.DEFAULT_TITLE_FONT_SIZE;
-			f.setSize(fontSize);
-			f.setStyle(Font.BOLD);
-		}
-		style.setFontList(fontArray);
-		return style;
-	}
-
-	public static PdfStyle createTableTitleStyle(ParameterData data, ReportSetting setting) throws DocumentException, IOException{
-		PdfStyle style = new PdfStyle();
-		Font[] fontArray = createFontArray();
-		for (int i = 0; i < fontArray.length; i++) {
-			Font f = fontArray[i];
-			float fontSize = data.getFontSizeColumnHeader()!=null? data.getFontSizeColumnHeader().floatValue() :  PdfConstants.DEFAULT_TABLE_HEADER_SIZE;
-			f.setSize(fontSize);
-			f.setStyle(Font.BOLD);
-		}
-		style.setFontList(fontArray);
-		return style;
-	}
-
-	public static PdfStyle createTableContentStyle(ParameterData data, ReportSetting setting) throws DocumentException, IOException{
-		PdfStyle style = new PdfStyle();
-		Font[] fontArray = createFontArray();
-		for (int i = 0; i < fontArray.length; i++) {
-			Font f = fontArray[i];
-			float fontSize = data.getFontSizeContent()!=null ? data.getFontSizeContent().floatValue() : PdfConstants.DEFAULT_TABLE_CONTENT_FONT_SIZE;
-			f.setSize(fontSize);
-			f.setStyle(Font.NORMAL);
-		}
-		style.setFontList(fontArray);
-		return style;
 	}
 
 }

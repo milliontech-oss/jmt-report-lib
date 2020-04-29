@@ -6,10 +6,14 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,8 +23,10 @@ import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -33,6 +39,7 @@ import com.milliontech.circle.data.model.CriteriaData;
 import com.milliontech.circle.data.model.ParameterData;
 import com.milliontech.circle.exception.MTReportException;
 import com.milliontech.circle.helper.MultiTableHelper;
+import com.milliontech.circle.helper.PdfFontRepository;
 import com.milliontech.circle.helper.PdfHelper;
 import com.milliontech.circle.model.AggregateCell;
 import com.milliontech.circle.model.ObjectCell;
@@ -59,12 +66,17 @@ public class MTPdfWriter implements MTWriter{
 	private ParameterData data;
 
 	public MTPdfWriter(ParameterData data, ReportSetting setting) throws DocumentException, IOException{
-		CRITERIA_STYLE = PdfHelper.createCriteriaStyle(data, setting);
-		HEADER_TITLE_STYLE = PdfHelper.createHeaderTitleStyle(data, setting);
-		TABLE_TITLE_STYLE = PdfHelper.createTableTitleStyle(data, setting);
-		CONTENT_STYLE = PdfHelper.createTableContentStyle(data, setting);
-		SUMMARY_CELL_STYLE = PdfHelper.createTableContentStyle(data, setting);
-		HEADER_FOOTER_STYLE = PdfHelper.createHeaderFooterStyle(data, setting);
+	    List<BaseFont> bfList = data.getFontFilePathList().isEmpty() ? 
+	            PdfFontRepository.SANS_SERIF_FONT_LIST : 
+	            PdfFontRepository.createBaseFontList(data.getFontFilePathList());
+	    
+	    CRITERIA_STYLE = new PdfStyle("criteria", PdfFontRepository.createFontList(bfList, Optional.ofNullable(data.getFontSizeCriteria()).orElse(PdfConstants.DEFAULT_CRITERIA_FONT_SIZE), Font.NORMAL));
+	    HEADER_TITLE_STYLE = new PdfStyle("title", PdfFontRepository.createFontList(bfList, Optional.ofNullable(data.getFontSizeTitle()).orElse(PdfConstants.DEFAULT_TITLE_FONT_SIZE), Font.BOLD));
+	    TABLE_TITLE_STYLE = new PdfStyle("columnHeader", PdfFontRepository.createFontList(bfList, Optional.ofNullable(data.getFontSizeColumnHeader()).orElse(PdfConstants.DEFAULT_TABLE_HEADER_SIZE), Font.BOLD));
+		CONTENT_STYLE = new PdfStyle("content", PdfFontRepository.createFontList(bfList, Optional.ofNullable(data.getFontSizeContent()).orElse(PdfConstants.DEFAULT_TABLE_CONTENT_FONT_SIZE), Font.NORMAL));
+		SUMMARY_CELL_STYLE = new PdfStyle("summary", PdfFontRepository.createFontList(bfList, Optional.ofNullable(data.getFontSizeContent()).orElse(PdfConstants.DEFAULT_TABLE_CONTENT_FONT_SIZE), Font.NORMAL));
+		HEADER_FOOTER_STYLE = new PdfStyle("headerFooter", PdfFontRepository.createFontList(bfList, 8f, Font.NORMAL));
+		
 		this.data = data;
 	}
 

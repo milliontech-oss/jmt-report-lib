@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +82,6 @@ public class ParameterDataConverter {
 		if(parameter.get(ParameterDataConstants.LANG)!=null){
 			data.setLang((String)parameter.get(ParameterDataConstants.LANG));
 		}
-
 		data.setCustomExcelCriteria((CustomExcelCriteria)parameter.get(ParameterDataConstants.CUSTOM_EXCEL_CRITERIA));
 		data.setCustomExcelPageSetup((CustomExcelPageSetup)parameter.get(ParameterDataConstants.CUSTOM_EXCEL_PRINT_PAGE_SETUP));
 		data.setCustomPdfFooter((CustomPdfFooter)parameter.get(ParameterDataConstants.CUSTOM_PDF_FOOTER));
@@ -106,7 +106,9 @@ public class ParameterDataConverter {
 		if(parameter.get(ParameterDataConstants.USE_WIDTH_IF_EMPTY)!=null){
 			data.setUseWidthIfEmpty((Boolean)parameter.get(ParameterDataConstants.USE_WIDTH_IF_EMPTY));
 		}
-
+		if(parameter.get(ParameterDataConstants.FONT_FILE_PATH_LIST) != null) {
+		    data.setFontFilePathList((List<String>) parameter.get(ParameterDataConstants.FONT_FILE_PATH_LIST));
+		}
 
 		return data;
 	}
@@ -134,25 +136,25 @@ public class ParameterDataConverter {
 
 	}
 
-	public static List convertToCriteriaDataList(ParameterData data){
-		List list = new ArrayList();
-		if(data.getCriteriaNameList() != null && data.getCriteriaValueList() != null){
-			if (!data.getCriteriaNameList().isEmpty() && !data.getCriteriaNameList().isEmpty()){
-				String[] nameArr = (String[])data.getCriteriaNameList().toArray(new String[]{});
-				String[] valueArr = (String[])data.getCriteriaValueList().toArray(new String[]{});
-				if(nameArr!=null && valueArr!=null && nameArr.length==valueArr.length){
-					for(int i=0; i<nameArr.length; i++){
-						CriteriaData d = new CriteriaData();
-						d.setName(nameArr[i]);
-						d.setValue(valueArr[i]);
-						list.add(d);
-					}
-				} else {
-					log.warn(String.format("Criteria name and value list size are not consistent. Name size: [%d], Value size: [%d]",
-							data.getCriteriaNameList().size(), data.getCriteriaValueList().size()));
-				}
-			}
+	public static List<CriteriaData> convertToCriteriaDataList(ParameterData data){
+		List<CriteriaData> list = new ArrayList<CriteriaData>();
+		if (CollectionUtils.isEmpty(data.getCriteriaNameList()) || CollectionUtils.isEmpty(data.getCriteriaValueList())) {
+		    return list;
 		}
+		
+        String[] nameArr = (String[])data.getCriteriaNameList().toArray(new String[]{});
+        String[] valueArr = (String[])data.getCriteriaValueList().toArray(new String[]{});
+        if(nameArr!=null && valueArr!=null && nameArr.length==valueArr.length){
+            for(int i=0; i<nameArr.length; i++){
+                CriteriaData d = new CriteriaData();
+                d.setName(nameArr[i]);
+                d.setValue(valueArr[i]);
+                list.add(d);
+            }
+        } else {
+            log.warn(String.format("Criteria name and value list size are not consistent. Name size: [%d], Value size: [%d]",
+                    data.getCriteriaNameList().size(), data.getCriteriaValueList().size()));
+        }
 		return list;
 	}
 
