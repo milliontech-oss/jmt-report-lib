@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 
 import com.itextpdf.text.BaseColor;
@@ -17,7 +18,9 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.FontSelector;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.milliontech.circle.constants.Constants;
@@ -181,61 +184,43 @@ public class PdfHelper {
 	public static Paragraph createDisplayParagraph(String value, Font font[], boolean underLine) {
 		return PdfHelper.createDisplayParagraph(value, font, underLine, null);
 	}
+	
+	public static Paragraph createDisplayParagraph(String value, Font fonts[], boolean underLine, TableHeader header) {
+        if (StringUtils.isBlank(value)) {
+            return new Paragraph(new Chunk());
+        }
+        
+        FontSelector selector = new FontSelector();
+        for (Font f : fonts) {
+            selector.addFont(f);
+        }
+        Phrase phrase = selector.process(value);
+        
+        Paragraph p = new Paragraph();
+        
+        float actualWidth = 0f;
+        for (Chunk c : phrase.getChunks()) {
+            if (underLine) {
+                c.setUnderline(1, -3);
+            }
+            actualWidth += c.getWidthPoint();
+        }
 
-	public static Paragraph createDisplayParagraph(String value, Font font[], boolean underLine, TableHeader header) {
-		if(value==null)
-			return new Paragraph(new Chunk());
-		Paragraph p = new Paragraph();
-		Font prvFont = font[font.length - 1];
-		Chunk chunk = new Chunk("");
-		chunk.setFont(prvFont);
-		if (underLine)
-			chunk.setUnderline(1, -3);
-		char chars[] = value.toCharArray();
-		// for(char c:value.toCharArray()){
-		for (int x = 0; x < chars.length; x++) {
-			char c = chars[x];
-			if (prvFont.getBaseFont().charExists(c)) {
-				chunk.append(String.valueOf(c));
-			} else {
-				// find a proper font
-				for (int i = 0; i < font.length; i++) {
-					Font f = font[i];
-					if (f.getBaseFont().charExists(c) || i == font.length - 1) {
-						if (prvFont == f) {
-							// same
-							chunk.append(String.valueOf(c));
-						} else {
-							p.add(chunk);
-							prvFont = f;
-							chunk = new Chunk(String.valueOf(c));
-							chunk.setFont(prvFont);
-							if (underLine)
-								chunk.setUnderline(1, -3);
-						}
-						break;
-					}
-				}
-			}
+        p.add(phrase);
 
-		}
-		p.add(chunk);
+        if(header!=null){
+            if(header.getWidth()<=0 && header.getPdfWidth()<=0){
+                if(actualWidth>header.getCalcWidth()){
+                    header.setCalcWidth(actualWidth);
+                }
+            }else if(header.getWidth() > 0){
+                header.setCalcWidth(header.getWidth());
+            }else if(header.getPdfWidth() > 0){
+                header.setCalcWidth(header.getPdfWidth());
+            }
+        }
 
-		if(header!=null){
-			if(header.getWidth()<=0 && header.getPdfWidth()<=0){
-				float width = chunk.getWidthPoint();
-				if(width>header.getCalcWidth()){
-					header.setCalcWidth(width);
-				}
-			}else if(header.getWidth() > 0){
-				header.setCalcWidth(header.getWidth());
-			}else if(header.getPdfWidth() > 0){
-				header.setCalcWidth(header.getPdfWidth());
-			}
-		}
-
-		return p;
-
+        return p;
 	}
 
 	public static Document createDocument(ParameterData data, ReportSetting setting){
