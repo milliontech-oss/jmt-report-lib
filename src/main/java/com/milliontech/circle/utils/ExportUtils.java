@@ -37,15 +37,10 @@ public class ExportUtils {
 
 	public static void exportReport(List dataList, Map parameter ,OutputStream out, ReportType reportType, Class clazz, Workbook templateExcel){
 		ParameterData data = ParameterDataConverter.convertToParameterData(parameter);
-		Report report = null;
 
 		XmlReader reader = new XmlReader();
-		try{
-			report = reader.readXmlToReportObject(parameter, data, clazz);
-			ParameterDataConverter.convertToParameterDataByReportSetting(data, parameter, report.getReportSetting());
-		}catch(Exception e){
-			log.error("Read XML Error : ",e);
-		}
+		Report report = reader.readXmlToReportObject(parameter, data, clazz);
+        ParameterDataConverter.convertToParameterDataByReportSetting(data, parameter, report.getReportSetting());
 
 		for(Iterator iter = report.getSummaryRowList().iterator(); iter.hasNext();){
 			SummaryRow sRow = (SummaryRow)iter.next();
@@ -80,7 +75,7 @@ public class ExportUtils {
 
 			}
 		}catch(Exception e){
-			log.error("Writer Report Error : ",e);
+			throw new RuntimeException("Writer Report Error: ", e);
 		}
 
 

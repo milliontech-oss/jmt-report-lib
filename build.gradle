@@ -24,6 +24,8 @@ eclipse {
 
 
 
+group = 'com.milliontech'
+version = '4.2.0-SNAPSHOT'
 sourceCompatibility = 1.8
 
 println "Gradle Version: ${project.getGradle().getGradleVersion().toString()}"
@@ -33,6 +35,11 @@ repositories {
     maven {
         url 'https://int.milliontech.com/mtnexus/repository/maven-public/'
     }
+}
+
+task sourceJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allJava
 }
 
 publishing {
@@ -47,10 +54,9 @@ publishing {
     }
 
     publications {
-        core(MavenPublication) {
-            group = 'com.milliontech'
+        mavenJava(MavenPublication) {
             artifactId = 'jmt-report-lib'
-            version = '4.1.0'
+            artifact tasks.sourceJar
             from components.java
         }
     }
@@ -67,6 +73,12 @@ java {
 
 
 dependencies {
+    modules {
+        module("commons-logging:commons-logging") {
+            replacedBy("org.slf4j:jcl-over-slf4j")
+        }
+    }
+
     // slf4j
     api("org.slf4j:slf4j-api:${slf4jVersion}");
 
@@ -94,6 +106,7 @@ dependencies {
 
     // Use JUnit test framework
     testImplementation('junit:junit:4.12')
+    testImplementation("org.slf4j:jcl-over-slf4j:${slf4jVersion}")
     testImplementation('ch.qos.logback:logback-classic:1.2.3')
 }
 
@@ -108,10 +121,26 @@ listrepos()
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
-        options.compilerArgs << '-parameters'
+        options.compilerArgs.addAll([
+             "-Xlint:all",
+             "-Xlint:-serial",
+             "-Xlint:-unchecked",
+             "-Xlint:-rawtypes",
+             "-Xlint:-cast",
+             "-parameters"
+        ])
         doFirst {
             println "current JVM = ${System.properties['java.vendor']} (${System.properties['java.version']}) (${System.properties['java.home']})"
             println "javac compiler flags => $options.allCompilerArgs"
         }
     }
+}
+
+test {
+    dependsOn 'cleanTest'
+
+    useJUnit()
+    minHeapSize = "256m"
+    maxHeapSize = "2G"
+    testLogging.showStandardStreams = true
 }

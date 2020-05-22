@@ -10,26 +10,18 @@ import org.w3c.dom.Node;
 import com.milliontech.circle.data.model.ParameterData;
 import com.milliontech.circle.helper.DataHelper;
 import com.milliontech.circle.model.SummaryRow;
+import com.milliontech.circle.xml.reader.XmlReaderNodeConverterRepository;
 
-public class SummaryRowXmlNodeConverter implements XmlNodeConverter{
+public class SummaryRowXmlNodeConverter implements XmlNodeConverter<SummaryRow>{
 	
-	private Map xmlNodeConverterMap;
-	
-	public SummaryRowXmlNodeConverter(){
-		xmlNodeConverterMap = new HashMap();
-		xmlNodeConverterMap.put("RangeCell", new RangeCellXmlNodeConverter());
-		xmlNodeConverterMap.put("ObjectCell", new ObjectCellXmlNodeConverter());
-		xmlNodeConverterMap.put("AggregateCell", new AggregateCellXmlNodeConverter());
-	}
-	
-	public void convertAndAddToList(List list, Element elmt, Map parameter, ParameterData data) {
+	public SummaryRow convertAndAddToList(List list, Element elmt, Map parameter, ParameterData data, Class clazz) {
 		SummaryRow row = new SummaryRow();
 		this.convertToObject(row, elmt, parameter, data);	
 		list.add(row);
+		return row;
 	}
 
-	public void convertToObject(Object object, Element elmt, Map parameter, ParameterData data) {
-		SummaryRow row = (SummaryRow)object;
+	public void convertToObject(SummaryRow row, Element elmt, Map parameter, ParameterData data) {
 		if(elmt.hasAttribute("key")){
 			row.setKey(DataHelper.getString(elmt.getAttribute("key"), ""));
 		}
@@ -40,14 +32,22 @@ public class SummaryRowXmlNodeConverter implements XmlNodeConverter{
 		
 		for(int i=0; i<elmt.getChildNodes().getLength();i++){
 			Node node = elmt.getChildNodes().item(i);
-			XmlNodeConverter converter = (XmlNodeConverter)xmlNodeConverterMap.get(node.getNodeName());			
-			if("RangeCell".equalsIgnoreCase(node.getNodeName())){				
-				converter.convertAndAddToList(row.getRangeCellList(), (Element)node, parameter, data);				
-			}else if("ObjectCell".equalsIgnoreCase(node.getNodeName())){				
-				converter.convertAndAddToList(row.getObjectCellList(), (Element)node, parameter, data);				
-			}else if("AggregateCell".equalsIgnoreCase(node.getNodeName())){				
-				converter.convertAndAddToList(row.getAggregateCellList(), (Element)node, parameter, data);
-			}				
+            if(node.getNodeType() != Node.ELEMENT_NODE){
+                continue;
+            }
+			XmlNodeConverter converter = XmlReaderNodeConverterRepository.getConverterByName(node.getNodeName());
+			List mutableList = null;
+			
+			if("RangeCell".equalsIgnoreCase(node.getNodeName())){
+			    mutableList = row.getRangeCellList();
+			}else if("ObjectCell".equalsIgnoreCase(node.getNodeName())){
+			    mutableList = row.getObjectCellList();
+			}else if("AggregateCell".equalsIgnoreCase(node.getNodeName())){
+			    mutableList = row.getAggregateCellList();
+			} else {
+			    throw new RuntimeException("unknown summary row defined: " + node.getNodeName());
+			}
+			converter.convertAndAddToList(mutableList, (Element)node, parameter, data, null);
 		}	
 	}
 

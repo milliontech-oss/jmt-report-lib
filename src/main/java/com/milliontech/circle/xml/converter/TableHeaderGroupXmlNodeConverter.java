@@ -12,17 +12,16 @@ import com.milliontech.circle.helper.DataHelper;
 import com.milliontech.circle.helper.MessageHelper;
 import com.milliontech.circle.model.TableHeaderGroup;
 
-public class TableHeaderGroupXmlNodeConverter implements XmlNodeConverter{
+public class TableHeaderGroupXmlNodeConverter implements XmlNodeConverter<TableHeaderGroup>{
 	
-	public void convertAndAddToList(List dataList, Element elmt, Map parameter, ParameterData data) {
+	public TableHeaderGroup convertAndAddToList(List dataList, Element elmt, Map parameter, ParameterData data, Class clazz) {
 		TableHeaderGroup grp = new TableHeaderGroup();
 		this.convertToObject(grp, elmt, parameter, data);		
 		dataList.add(grp);
+		return grp;
 	}
 
-	public void convertToObject(Object object, Element elmt, Map parameter, ParameterData data) {
-		TableHeaderGroup grp = (TableHeaderGroup)object;
-		
+	public void convertToObject(TableHeaderGroup grp, Element elmt, Map parameter, ParameterData data) {
 		if(elmt.hasAttribute("title")){
 			grp.setTitle(DataHelper.getString(elmt.getAttribute("title"), ""));
 		}
@@ -33,7 +32,7 @@ public class TableHeaderGroupXmlNodeConverter implements XmlNodeConverter{
 		
 		if(elmt.hasAttribute("msgKey")){
 			grp.setMsgKey(DataHelper.getString(elmt.getAttribute("msgKey"), ""));
-			MessageHelper.setTitleByMessageKey(parameter, grp);
+			MessageHelper.setTitleByMessageKey(parameter, data, grp);
 		}
 		
 		for(int i=0; i<elmt.getChildNodes().getLength();i++){
@@ -41,12 +40,12 @@ public class TableHeaderGroupXmlNodeConverter implements XmlNodeConverter{
 			
 			if("TableHeaderGroup".equals(node.getNodeName())){
 				
-				convertAndAddToList(grp.getTableHeaderGroupList(), (Element)node, parameter, data);
+				convertAndAddToList(grp.getTableHeaderGroupList(), (Element)node, parameter, data, null);
 				
 			}else if("TableHeader".equals(node.getNodeName())){
 				
 				TableHeaderXmlNodeConverter converter = new TableHeaderXmlNodeConverter();
-				converter.convertAndAddToList(grp.getTableHeaderList(), (Element)node, parameter, data);				
+				converter.convertAndAddToList(grp.getTableHeaderList(), (Element)node, parameter, data, null);				
 				Collections.sort(grp.getTableHeaderList());				
 				
 			}

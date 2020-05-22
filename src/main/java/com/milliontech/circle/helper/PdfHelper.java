@@ -73,41 +73,6 @@ public class PdfHelper {
 		table.addCell(cell);
 	}
 
-	public static Object getCellValue(Class clazz, Object obj, String method, String property, Map methodValMapMap) throws Exception{
-		Object value = null;
-		
-		if(method!=null){
-			value = MethodUtils.invokeExactMethod(obj, method);
-		}
-
-		if(property!=null){
-			try{
-				value = BeanUtil.pojo.getProperty(obj, property);
-			}catch(Exception e){}
-		}
-
-		if(methodValMapMap!=null && value!=null){
-			value = DataHelper.getRemapValue(value, methodValMapMap, method, property);
-		}
-
-		return value;
-	}
-
-	public static boolean isHighlight(Class clazz, Object obj, String property){
-		boolean result = false;
-		if(property!=null && property.trim()!=null){
-			try{
-				Boolean b = (Boolean)PdfHelper.getCellValue(clazz, obj, null, property, null);
-				if(b!=null){
-					result = b.booleanValue();
-				}
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-		}
-		return result;
-	}
-
 	public static BaseColor getHighlightColor(String color){
 		if("blue".equalsIgnoreCase(color)){
 			return PdfConstants.HIGHLIGHT_BLUE_COLOR;

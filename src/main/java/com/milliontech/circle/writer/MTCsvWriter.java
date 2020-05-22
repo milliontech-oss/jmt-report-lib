@@ -16,6 +16,7 @@ import org.supercsv.prefs.CsvPreference;
 
 import com.milliontech.circle.data.model.ParameterData;
 import com.milliontech.circle.helper.PdfHelper;
+import com.milliontech.circle.helper.ValueHelper;
 import com.milliontech.circle.model.Report;
 import com.milliontech.circle.model.TableHeader;
 
@@ -52,7 +53,7 @@ public class MTCsvWriter implements MTWriter{
 				 for(Iterator hIter = headerList.iterator(); hIter.hasNext();){
 					TableHeader header = (TableHeader)hIter.next();
 						
-					Object value = PdfHelper.getCellValue(obj.getClass(), obj, header.getMethod(), header.getProperty(), data.getRemapValueMap());
+					Object value = ValueHelper.getDataValue(obj.getClass(), obj, header.getMethod(), header.getProperty(), data.getRemapValueMap());
 					String strValue = PdfHelper.getCellStringValue(value, header.getFormat());
 					list.add(strValue);
 									

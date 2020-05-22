@@ -11,23 +11,23 @@ import com.milliontech.circle.helper.DataHelper;
 import com.milliontech.circle.helper.MessageHelper;
 import com.milliontech.circle.model.RangeCell;
 
-public class RangeCellXmlNodeConverter implements XmlNodeConverter{
+public class RangeCellXmlNodeConverter implements XmlNodeConverter<RangeCell>{
 
-	public void convertAndAddToList(List list, Element elmt, Map parameter, ParameterData data) {
+	public RangeCell convertAndAddToList(List list, Element elmt, Map parameter, ParameterData data, Class clazz) {
 		RangeCell cell = new RangeCell();
 		this.convertToObject(cell, elmt, parameter, data);		
-		list.add(cell);		
+		list.add(cell);
+		return cell;
 	}
 
-	public void convertToObject(Object object, Element elmt, Map parameter, ParameterData data) {
-		RangeCell cell = (RangeCell)object;
+	public void convertToObject(RangeCell cell, Element elmt, Map parameter, ParameterData data) {
 		cell.setAlign(DataHelper.getString(elmt.getAttribute("align"), Constants.ALIGN_RIGHT));
 		cell.setEnd(DataHelper.getInteger(elmt.getAttribute("end"), 0));
 		cell.setMsgKey(DataHelper.getString(elmt.getAttribute("msgKey"), null));
 		cell.setStart(DataHelper.getInteger(elmt.getAttribute("start"), 0));
 		cell.setTitle(DataHelper.getString(elmt.getAttribute("title"), null));
 		cell.setDynamicProperty(DataHelper.isTrue(elmt.getAttribute("dynamicProperty"), false));
-		MessageHelper.setTitleByMessageKey(parameter, cell);
+		MessageHelper.setTitleByMessageKey(parameter, data, cell);
 	}
 	
 }

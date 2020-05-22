@@ -1,19 +1,15 @@
 package com.milliontech.circle.writer;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -41,6 +37,7 @@ import com.milliontech.circle.exception.MTReportException;
 import com.milliontech.circle.helper.MultiTableHelper;
 import com.milliontech.circle.helper.PdfFontRepository;
 import com.milliontech.circle.helper.PdfHelper;
+import com.milliontech.circle.helper.ValueHelper;
 import com.milliontech.circle.model.AggregateCell;
 import com.milliontech.circle.model.ObjectCell;
 import com.milliontech.circle.model.RangeCell;
@@ -65,7 +62,7 @@ public class MTPdfWriter implements MTWriter{
 	private PdfStyle HEADER_FOOTER_STYLE;
 	private ParameterData data;
 
-	public MTPdfWriter(ParameterData data, ReportSetting setting) throws DocumentException, IOException{
+	public MTPdfWriter(ParameterData data, ReportSetting setting){
 	    List<BaseFont> bfList = data.getFontFilePathList().isEmpty() ? 
 	            PdfFontRepository.SANS_SERIF_FONT_LIST : 
 	            PdfFontRepository.createBaseFontList(data.getFontFilePathList());
@@ -84,6 +81,7 @@ public class MTPdfWriter implements MTWriter{
 		this.data = data;
 		Document document = PdfHelper.createDocument(data, report.getReportSetting());
 	    PdfWriter writer = PdfWriter.getInstance(document, out);
+	    writer.setPdfVersion(PdfWriter.VERSION_1_7);
 	    writer.setPageEvent(new HeaderFooter(data, report.getReportSetting(), HEADER_FOOTER_STYLE, HEADER_FOOTER_STYLE));
 	    document.open();
 
@@ -137,7 +135,7 @@ public class MTPdfWriter implements MTWriter{
 		String splitBy = "";
 		for(Iterator iter = dataList.iterator(); iter.hasNext();){
 			Object obj = iter.next();
-			String value = PdfHelper.getCellValue(obj.getClass(), obj, report.getReportSetting().getMultiTableSplitBy(),null, data.getRemapValueMap()).toString();
+			String value = ValueHelper.getDataValue(obj.getClass(), obj, report.getReportSetting().getMultiTableSplitBy(),null, data.getRemapValueMap()).toString();
 			if(lastValue == null){
 				lastValue = value;
 			}else if(!lastValue.equals(value)){
@@ -239,7 +237,7 @@ public class MTPdfWriter implements MTWriter{
 				for(Iterator oIter = row.getObjectCellList().iterator(); oIter.hasNext();){
 					ObjectCell cell = (ObjectCell)oIter.next();
 					if(cell.getColumn()==i){
-						Object object = PdfHelper.getCellValue(dataRow.getClass(), dataRow, cell.getMethod(), null, data.getRemapValueMap());
+						Object object = ValueHelper.getDataValue(dataRow.getClass(), dataRow, cell.getMethod(), null, data.getRemapValueMap());
 						value = PdfHelper.getCellStringValue(object, cell.getFormat());
 						align = cell.getAlign();
 					}
@@ -341,11 +339,11 @@ public class MTPdfWriter implements MTWriter{
 			for(Iterator hIter = list.iterator(); hIter.hasNext();){
 				TableHeader header = (TableHeader)hIter.next();
 				if(header.isMergeIfSame()){
-					Object value = PdfHelper.getCellValue(obj.getClass(), obj, header.getMethod(), header.getProperty(), data.getRemapValueMap());
+					Object value = ValueHelper.getDataValue(obj.getClass(), obj, header.getMethod(), header.getProperty(), data.getRemapValueMap());
 					String strValue = PdfHelper.getCellStringValue(value, header.getFormat());
 					String mergeKeyValue = "";
 					if(header.getMergeKey()!=null){
-						Object v = PdfHelper.getCellValue(obj.getClass(), obj, header.getMergeKey(), null, data.getRemapValueMap());
+						Object v = ValueHelper.getDataValue(obj.getClass(), obj, header.getMergeKey(), null, data.getRemapValueMap());
 						if(v != null){
 							mergeKeyValue = v.toString();
 						}
@@ -389,7 +387,7 @@ public class MTPdfWriter implements MTWriter{
 			}
 
 			if(report.getReportSetting().isShowRowNo()){
-				boolean highlight = PdfHelper.isHighlight(obj.getClass(), obj, report.getReportSetting().getHighlightRowNoFld());
+				boolean highlight = ValueHelper.isHighlight(obj.getClass(), obj, report.getReportSetting().getHighlightRowNoFld());
 				BaseColor color = highlight ? PdfHelper.getHighlightColor(report.getReportSetting().getHighlightRowNoColor()) : null;
 				PdfHelper.createPdfCell(dataTable, ""+(rowIndex+1), CONTENT_STYLE, null, Rectangle.BOX, Constants.ALIGN_LEFT, color, grey);
 			}
@@ -398,10 +396,10 @@ public class MTPdfWriter implements MTWriter{
 			for(Iterator hIter = list.iterator(); hIter.hasNext();){
 				TableHeader header = (TableHeader)hIter.next();
 
-				Object value = PdfHelper.getCellValue(obj.getClass(), obj, header.getMethod(), header.getProperty(), data.getRemapValueMap());
+				Object value = ValueHelper.getDataValue(obj.getClass(), obj, header.getMethod(), header.getProperty(), data.getRemapValueMap());
 				String strValue = PdfHelper.getCellStringValue(value, header.getFormat());
 				String align = Constants.ALIGN_LEFT;
-				boolean highlight = PdfHelper.isHighlight(obj.getClass(), obj, header.getHighlightFld());
+				boolean highlight = ValueHelper.isHighlight(obj.getClass(), obj, header.getHighlightFld());
 				BaseColor color = highlight ? PdfHelper.getHighlightColor(header.getHighlightColor()) : null;
 				if(header.getAlign()!=null){
 					align = header.getAlign();

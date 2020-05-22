@@ -7,9 +7,9 @@ import org.w3c.dom.Element;
 
 import com.milliontech.circle.data.model.ParameterData;
 
-public interface XmlNodeConverter {
+public interface XmlNodeConverter<T> {
 
-	public void convertAndAddToList(List list, Element elmt, Map parameter, ParameterData data);
-	public void convertToObject(Object object, Element elmt, Map parameter, ParameterData data);
+	public T convertAndAddToList(List list, Element elmt, Map parameter, ParameterData data, Class clazz);
+	public void convertToObject(T object, Element elmt, Map parameter, ParameterData data);
 	
 }

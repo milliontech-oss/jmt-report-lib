@@ -3,25 +3,25 @@ package com.milliontech.circle.xml.converter;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.w3c.dom.Element;
 
 import com.milliontech.circle.constants.ExcelConstants;
+import com.milliontech.circle.constants.ParameterDataConstants;
 import com.milliontech.circle.data.model.ParameterData;
 import com.milliontech.circle.helper.DataHelper;
 import com.milliontech.circle.model.ReportSetting;
 
-public class ReportSettingXmlNodeConverter implements XmlNodeConverter{
+public class ReportSettingXmlNodeConverter implements XmlNodeConverter<ReportSetting> {
 
-	public void convertAndAddToList(List dataList, Element elmt, Map parameter, ParameterData data) {
+	public ReportSetting convertAndAddToList(List dataList, Element elmt, Map parameter, ParameterData data, Class clazz) {
 		ReportSetting setting = new ReportSetting();
 		this.convertToObject(setting, elmt, parameter, data);
 		dataList.add(setting);
+		return setting;
 	}
 
-	public void convertToObject(Object object, Element elmt, Map parameter, ParameterData data) {
-		ReportSetting setting = (ReportSetting)object;
-
-
+	public void convertToObject(ReportSetting setting, Element elmt, Map parameter, ParameterData data) {
 		if(elmt.hasAttribute("showPrintDate")){
 			setting.setShowPrintDate(DataHelper.isTrue(elmt.getAttribute("showPrintDate"), true));
 		}
@@ -99,7 +99,10 @@ public class ReportSettingXmlNodeConverter implements XmlNodeConverter{
 		if(elmt.hasAttribute("excelFontName")){
 			setting.setExcelFontName(DataHelper.getString(elmt.getAttribute("excelFontName"), ExcelConstants.DEFAULT_FONT_NAME));
 		}
-
+		
+		if (parameter.containsKey(ParameterDataConstants.PDF_DEFAULT_SHOW_ROW_NO)) {
+		    setting.setShowRowNo(DataHelper.isTrue((String)parameter.get(ParameterDataConstants.PDF_DEFAULT_SHOW_ROW_NO), true));
+		}
 		if(elmt.hasAttribute("showRowNo")){
 			setting.setShowRowNo(DataHelper.isTrue(elmt.getAttribute("showRowNo"), true));
 		}

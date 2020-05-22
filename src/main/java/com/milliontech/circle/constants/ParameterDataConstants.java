@@ -26,5 +26,7 @@ public class ParameterDataConstants {
 	public static final String SXSSF_KEEP_TMP_FILE = "jmtSXSSFKeepTmpFile";
 	public static final String USE_WIDTH_IF_EMPTY = "jmtUseWidthIfEmpty";
 	public static final String FONT_FILE_PATH_LIST = "jmtFontFilePathList";
+	public static final String MSG_KEY_PROP_MAP = "jmtMsgKeyPropMap";
+	public static final String PDF_DEFAULT_SHOW_ROW_NO = "jmtPdfDefaultShowRowNo";
 
 }

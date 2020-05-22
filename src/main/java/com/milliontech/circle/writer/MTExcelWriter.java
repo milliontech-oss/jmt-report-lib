@@ -14,7 +14,7 @@ import java.util.Optional;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.poi.hpsf.DocumentSummaryInformation;
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hssf.usermodel.HSSFHeader;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -33,6 +33,7 @@ import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.SheetUtil;
 import org.apache.poi.ss.util.WorkbookUtil;
+import org.apache.poi.util.CodePageUtil;
 import org.apache.poi.util.TempFile;
 import org.apache.poi.util.TempFileCreationStrategy;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -52,7 +53,7 @@ import com.milliontech.circle.exception.MTReportException;
 import com.milliontech.circle.helper.DataHelper;
 import com.milliontech.circle.helper.ExcelHelper;
 import com.milliontech.circle.helper.MultiTableHelper;
-import com.milliontech.circle.helper.PdfHelper;
+import com.milliontech.circle.helper.ValueHelper;
 import com.milliontech.circle.model.AggregateCell;
 import com.milliontech.circle.model.ObjectCell;
 import com.milliontech.circle.model.RangeCell;
@@ -240,9 +241,13 @@ public class MTExcelWriter implements MTWriter{
 
 	private void doWriteDocumentProperties(HSSFWorkbook wb, ParameterData data, String title) {
 	    SummaryInformation summaryInfo = wb.getSummaryInformation();
+	    summaryInfo.getFirstSection().setCodepage(CodePageUtil.CP_UTF8);
 	    summaryInfo.setAuthor(data.getAuthorName());
 	    summaryInfo.setCreateDateTime(data.getPrintDate());
 	    summaryInfo.setTitle(title);
+	    
+	    DocumentSummaryInformation docInfo = wb.getDocumentSummaryInformation();
+	    docInfo.getFirstSection().setCodepage(CodePageUtil.CP_UTF8);
 	}
 	
 	private void doWriteDocumentProperties(XSSFWorkbook wb, ParameterData data, String title) {
@@ -261,7 +266,7 @@ public class MTExcelWriter implements MTWriter{
 		String splitBy = "";
 		for(Iterator iter = dataList.iterator(); iter.hasNext();){
 			Object obj = iter.next();
-			String value = PdfHelper.getCellValue(obj.getClass(), obj, report.getReportSetting().getMultiTableSplitBy(),null, data.getRemapValueMap()).toString();
+			String value = ValueHelper.getDataValue(obj.getClass(), obj, report.getReportSetting().getMultiTableSplitBy(), null, data.getRemapValueMap()).toString();
 			if(lastValue == null){
 				lastValue = value;
 			}else if(!lastValue.equals(value)){
@@ -452,7 +457,7 @@ public class MTExcelWriter implements MTWriter{
 				//log.debug("["+cell.getRowIndex()+","+cell.getColumnIndex()+"] : "+header.getTitle());
 
 				if(endRows - 1 > currentRow){
-					log.info(String.format("currentRow: %s, endRows: %s, columnIndex: %s", currentRow, endRows, cell.getColumnIndex()));
+					log.debug(String.format("currentRow: %s, endRows: %s, columnIndex: %s", currentRow, endRows, cell.getColumnIndex()));
 					sheet.addMergedRegion(new CellRangeAddress(currentRow, endRows-1, cell.getColumnIndex(), cell.getColumnIndex()));
 
 					for(int a=currentRow+1; a<endRows;a++){
@@ -489,8 +494,8 @@ public class MTExcelWriter implements MTWriter{
 				TableHeader header = (TableHeader) headers.get(index);
 				Cell cell = row.createCell(index);
 
-				boolean isHighlight = ExcelHelper.isHighlight(obj.getClass(), obj, header.getHighlightFld());
-				boolean isItalics = ExcelHelper.isItalics(obj.getClass(), obj, header.getItalicsFld());
+				boolean isHighlight = ValueHelper.isHighlight(obj.getClass(), obj, header.getHighlightFld());
+				boolean isItalics = ValueHelper.isItalics(obj.getClass(), obj, header.getItalicsFld());
 
 				String styleKey = MessageFormat.format("ColumnContent_{0}_Font_{1}_Highlight_{2}",
 						new Object[] { header.getColumn(), (isItalics ? "I" : ""), (isHighlight ? header.getHighlightColor() : "NA") });
@@ -798,18 +803,18 @@ public class MTExcelWriter implements MTWriter{
 			SXSSFSheet s = (SXSSFSheet)sheet;
 			if(forceFlush || (s.getLastRowNum() - s.getLastFlushedRowNum() >= data.getSxssfRowAccessWindowSize())){
 				List headers = report.getFullTableHeaderList();
-				/*
+				
 				if(log.isTraceEnabled()){
 					log.trace(String.format("LastRow: %d, LastFlushedRow: %d, Window Size: %d", s.getLastRowNum(), s.getLastFlushedRowNum(), data.getSxssfRowAccessWindowSize()));
 				}
-				*/
+				
 				for (int index = 0; index < headers.size(); index++) {
 					TableHeader header = (TableHeader) headers.get(index);
 					Integer origWidth = sxssfColumnWidthMap.get(header);
 					int newWidth = -1;
 					
 					if (header.isHidden()) {
-						//log.info(String.format("Column %d, set hidden", index));
+						log.debug(String.format("Column %d, set hidden", index));
 						sheet.setColumnHidden(index, true);
 						continue;
 					}
@@ -828,11 +833,9 @@ public class MTExcelWriter implements MTWriter{
 					}
 
 					if (origWidth == null || newWidth > origWidth.intValue()){
-						/*
 						if(log.isTraceEnabled()){
 							log.trace(String.format("Column %d, Width %d --> %d", index, origWidth, newWidth));
 						}
-						*/
 						sheet.setColumnWidth(index, newWidth);
 						sxssfColumnWidthMap.put(header, new Integer(newWidth));
 					}
@@ -845,11 +848,10 @@ public class MTExcelWriter implements MTWriter{
 
 	private void flushRow(SXSSFSheet s) {
 		if(s.getLastRowNum() > 0){
-			/*
 			if(log.isTraceEnabled()){
 				log.trace(String.format("Flushing %d row to disk", s.getLastRowNum() - s.getLastFlushedRowNum()));
 			}
-			*/
+			
 			try {
 				s.flushRows();
 			} catch (IOException e) {

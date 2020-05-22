@@ -10,16 +10,16 @@ import com.milliontech.circle.data.model.ParameterData;
 import com.milliontech.circle.helper.DataHelper;
 import com.milliontech.circle.model.ObjectCell;
 
-public class ObjectCellXmlNodeConverter implements XmlNodeConverter{
+public class ObjectCellXmlNodeConverter implements XmlNodeConverter<ObjectCell>{
 
-	public void convertAndAddToList(List list, Element elmt, Map parameter, ParameterData data) {
+	public ObjectCell convertAndAddToList(List list, Element elmt, Map parameter, ParameterData data, Class clazz) {
 		ObjectCell cell = new ObjectCell();
 		this.convertToObject(cell, elmt, parameter, data);
 		list.add(cell);
+		return cell;
 	}
 
-	public void convertToObject(Object object, Element elmt, Map parameter, ParameterData data) {
-		ObjectCell cell = (ObjectCell)object;
+	public void convertToObject(ObjectCell cell, Element elmt, Map parameter, ParameterData data) {
 		cell.setColumn(DataHelper.getInteger(elmt.getAttribute("column"), 0));
 		cell.setMethod(DataHelper.getString(elmt.getAttribute("method"), null));
 		cell.setProperty(DataHelper.getString(elmt.getAttribute("property"), null));

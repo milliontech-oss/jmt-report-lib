@@ -1,18 +1,17 @@
 package com.milliontech.circle.helper;
 
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFPalette;
@@ -20,7 +19,6 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
@@ -31,6 +29,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -40,31 +39,31 @@ import com.milliontech.circle.constants.ExcelConstants;
 import com.milliontech.circle.data.model.ParameterData;
 import com.milliontech.circle.model.ReportSetting;
 
-import jodd.bean.BeanUtil;
-
 public class ExcelHelper {
 
 	private static final Map<String, IndexedColors> highlightColorMap;
 	private static final Map<IndexedColors, java.awt.Color> colorMap;
 
 	static {
-		highlightColorMap = new HashMap<String, IndexedColors>();
-		highlightColorMap.put("blue", IndexedColors.LIGHT_BLUE);
-		highlightColorMap.put("yellow", IndexedColors.YELLOW);
-		highlightColorMap.put("purple", IndexedColors.VIOLET);
-		highlightColorMap.put("red", IndexedColors.RED);
-		highlightColorMap.put("pink", IndexedColors.PINK);
-		highlightColorMap.put("orange", IndexedColors.ORANGE);
-		highlightColorMap.put("default", IndexedColors.LIGHT_GREEN);
+	    Map<String, IndexedColors> _highlightColorMap = new HashMap<String, IndexedColors>();
+		_highlightColorMap.put("blue", IndexedColors.LIGHT_BLUE);
+		_highlightColorMap.put("yellow", IndexedColors.YELLOW);
+		_highlightColorMap.put("purple", IndexedColors.VIOLET);
+		_highlightColorMap.put("red", IndexedColors.RED);
+		_highlightColorMap.put("pink", IndexedColors.PINK);
+		_highlightColorMap.put("orange", IndexedColors.ORANGE);
+		_highlightColorMap.put("default", IndexedColors.LIGHT_GREEN);
+		highlightColorMap = Collections.unmodifiableMap(_highlightColorMap);
 
-		colorMap = new HashMap<IndexedColors, java.awt.Color>();
-		colorMap.put(IndexedColors.LIGHT_BLUE, new java.awt.Color(70, 130, 180));
-		colorMap.put(IndexedColors.YELLOW, new java.awt.Color(250, 249, 182));
-		colorMap.put(IndexedColors.VIOLET, new java.awt.Color(240, 158, 247));
-		colorMap.put(IndexedColors.RED, new java.awt.Color(205, 0, 0));
-		colorMap.put(IndexedColors.PINK, new java.awt.Color(250, 195, 182));
-		colorMap.put(IndexedColors.ORANGE, new java.awt.Color(255, 127, 0));
-		colorMap.put(IndexedColors.LIGHT_GREEN, new java.awt.Color(34, 139, 34));
+		Map<IndexedColors, java.awt.Color> _colorMap = new HashMap<IndexedColors, java.awt.Color>();
+		_colorMap.put(IndexedColors.LIGHT_BLUE, new java.awt.Color(70, 130, 180));
+		_colorMap.put(IndexedColors.YELLOW, new java.awt.Color(250, 249, 182));
+		_colorMap.put(IndexedColors.VIOLET, new java.awt.Color(240, 158, 247));
+		_colorMap.put(IndexedColors.RED, new java.awt.Color(205, 0, 0));
+		_colorMap.put(IndexedColors.PINK, new java.awt.Color(250, 195, 182));
+		_colorMap.put(IndexedColors.ORANGE, new java.awt.Color(255, 127, 0));
+		_colorMap.put(IndexedColors.LIGHT_GREEN, new java.awt.Color(34, 139, 34));
+		colorMap = Collections.unmodifiableMap(_colorMap);
 	}
 
 	public static void resetColorPalette(HSSFWorkbook wb){
@@ -88,7 +87,7 @@ public class ExcelHelper {
 	}
 
 	public static Object setCellValue(Class clazz, Object obj, String method, String property, Cell cell, DataFormat format, String align, Map methodValMapMap) throws Exception{
-		Object value = getDataValue(clazz, obj, method, property, methodValMapMap);
+		Object value = ValueHelper.getDataValue(clazz, obj, method, property, methodValMapMap);
 
 		if(value==null){
             cell.setCellValue("");
@@ -163,23 +162,7 @@ public class ExcelHelper {
 
 		return value;
 	}
-
-	public static boolean isItalics(Class clazz, Object obj, String property) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		Boolean result = (Boolean)ExcelHelper.getDataValue(clazz, obj, null, property, null);
-		if(result==null){
-			return false;
-		}
-		return result.booleanValue();
-	}
-
-	public static boolean isHighlight(Class clazz, Object obj, String property) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		Boolean result = (Boolean)ExcelHelper.getDataValue(clazz, obj, null, property, null);
-		if(result==null){
-			return false;
-		}
-		return result.booleanValue();
-	}
-
+	
 	public static void setHightlightColor(CellStyle style, String color){
 		IndexedColors indexColor = highlightColorMap.get(StringUtils.lowerCase(color));
 		if (indexColor == null){
@@ -190,30 +173,10 @@ public class ExcelHelper {
 			style.setFillForegroundColor(indexColor.getIndex());
 		} else {
 			XSSFCellStyle xcs = (XSSFCellStyle) style;
-			xcs.setFillForegroundColor(new XSSFColor(colorMap.get(indexColor)));
+			xcs.setFillForegroundColor(new XSSFColor(colorMap.get(indexColor), new DefaultIndexedColorMap()));
 		}
 
 		style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-	}
-
-	public static Object getDataValue(Class clazz, Object obj, String method, String property, Map methodValMapMap) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		Object value = null;
-		if(method!=null){
-			value = MethodUtils.invokeExactMethod(obj, method);
-		}
-
-		if(property!=null){
-			try{
-			    value = BeanUtil.pojo.getProperty(obj, property);
-			}catch(Exception e){
-				value = null;
-			}
-		}
-
-		if(methodValMapMap!=null && value!=null){
-			value = DataHelper.getRemapValue(value, methodValMapMap, method, property);
-		}
-		return value;
 	}
 
 	/**********************************
@@ -268,7 +231,7 @@ public class ExcelHelper {
 				XSSFCellStyle xs = (XSSFCellStyle) style;
 				if(setting.getTableHeaderColorArray() != null){
 					int[] colorArray = setting.getTableHeaderColorArray();
-					xs.setFillForegroundColor(new XSSFColor(new java.awt.Color(colorArray[0], colorArray[1], colorArray[2])));
+					xs.setFillForegroundColor(new XSSFColor(new java.awt.Color(colorArray[0], colorArray[1], colorArray[2]), new DefaultIndexedColorMap()));
 				} else {
 					xs.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
 				}

@@ -31,6 +31,7 @@ public class TableHeader implements Comparable, MessageKeyTitleElement, TableCol
 	private String italicsFld;
 	private boolean wrapText;
 	private boolean hidden;
+	private String xmlRemap;
 
 	public TableHeader(){
 		subColumn = 0;
@@ -186,7 +187,15 @@ public class TableHeader implements Comparable, MessageKeyTitleElement, TableCol
 		this.hidden = hidden;
 	}
 
-	public String toString() {
+	public String getXmlRemap() {
+        return xmlRemap;
+    }
+
+    public void setXmlRemap(String xmlRemap) {
+        this.xmlRemap = xmlRemap;
+    }
+
+    public String toString() {
 		return ReflectionToStringBuilder.toString(this, ToStringStyle.MULTI_LINE_STYLE);
 	}
 	public int compareTo(Object o) {
