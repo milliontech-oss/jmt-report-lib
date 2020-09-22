@@ -92,28 +92,18 @@ public class ExcelHelper {
 		if(value==null){
             cell.setCellValue("");
 		}else if(value instanceof java.util.Date){
-			cell.setCellValue((Date)value);
-		}else if(value instanceof java.sql.Date){
-			java.sql.Date d = (java.sql.Date)value;
+            /* javal.sql.Date and java.sql.Timestamp also extends from java.util.Date */
+            java.util.Date utilDate = (java.util.Date) value;
             String excelCellFormat = cell.getCellStyle().getDataFormatString();
             boolean needTruncateToSecond = !excelCellFormat.endsWith("0");
             if (needTruncateToSecond) {
-                cell.setCellValue(DateUtils.truncate(d, Calendar.SECOND));
+                cell.setCellValue(DateUtils.truncate(utilDate, Calendar.SECOND));
             } else {
-                cell.setCellValue(d);
+                cell.setCellValue(utilDate);
             }
 		}else if(value instanceof java.time.LocalDate){
 			java.time.LocalDate d = (java.time.LocalDate)value;
 			cell.setCellValue(java.util.Date.from(d.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
-		}else if(value instanceof Timestamp){
-			Timestamp t = (Timestamp)value;
-            String excelCellFormat = cell.getCellStyle().getDataFormatString();
-            boolean needTruncateToSecond = !excelCellFormat.endsWith("0");
-            if (needTruncateToSecond) {
-                cell.setCellValue(DateUtils.truncate(t, Calendar.SECOND));
-            } else {
-                cell.setCellValue(new java.util.Date(t.getTime()));
-            }
 		}else if(value instanceof Instant){
 		    Instant i = (Instant)value;
 		    String excelCellFormat = cell.getCellStyle().getDataFormatString();
@@ -162,7 +152,7 @@ public class ExcelHelper {
 
 		return value;
 	}
-	
+
 	public static void setHightlightColor(CellStyle style, String color){
 		IndexedColors indexColor = highlightColorMap.get(StringUtils.lowerCase(color));
 		if (indexColor == null){
@@ -280,10 +270,10 @@ public class ExcelHelper {
 		return style;
 	}
 
-	public static CellStyle createContentStyle(Workbook wb, ParameterData data, ReportSetting setting, String format, 
+	public static CellStyle createContentStyle(Workbook wb, ParameterData data, ReportSetting setting, String format,
 			boolean isHighlight, String highlightColor, boolean isItalicsFont, boolean isWrapText, String align){
 		CellStyle style = wb.createCellStyle();
-		
+
 		style.setAlignment(getPoiAlign(align, HorizontalAlignment.LEFT));
 		style.setVerticalAlignment(VerticalAlignment.CENTER);
 
@@ -318,7 +308,7 @@ public class ExcelHelper {
 
 		return style;
 	}
-	
+
 	public static CellStyle createSummaryCellStyle(Workbook wb, ParameterData data, ReportSetting setting, String align, boolean hightlight){
 		CellStyle style = wb.createCellStyle();
 		style.setAlignment(getPoiAlign(align, HorizontalAlignment.RIGHT));
@@ -352,10 +342,10 @@ public class ExcelHelper {
 		style.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
 		style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 	}
-	
+
 	private static HorizontalAlignment getPoiAlign(String align, HorizontalAlignment defaultPoiAlign) {
 		HorizontalAlignment poiAlign = defaultPoiAlign;
-		
+
 		if(Constants.ALIGN_LEFT.equals(align)) {
 			poiAlign = HorizontalAlignment.LEFT;
 		} else if(Constants.ALIGN_CENTER.equals(align)) {
@@ -363,7 +353,7 @@ public class ExcelHelper {
 		} else if(Constants.ALIGN_RIGHT.equals(align)) {
 			poiAlign = HorizontalAlignment.RIGHT;
 		}
-		
+
 		return poiAlign;
 	}
 

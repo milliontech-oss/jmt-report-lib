@@ -94,17 +94,12 @@ public class PdfHelper {
 		if(value==null){
 			textValue = "";
 		}else if(value instanceof java.util.Date){
-			Date d = (Date)value;
-			textValue = format != null? DataHelper.formatDate(d, format) : DataHelper.formatDate(d, Constants.DEFAULT_DATE_FORMAT);
-		}else if(value instanceof java.sql.Date){
-			java.sql.Date d = (java.sql.Date)value;
-			textValue = format != null? DataHelper.formatDate(d, format) : DataHelper.formatDate(d, Constants.DEFAULT_DATE_FORMAT);
+            java.util.Date d = (java.util.Date)value;
+            String defaultFormat = (value instanceof java.sql.Timestamp) ? Constants.DEFAULT_TIMESTAMP_FORMAT : Constants.DEFAULT_DATE_FORMAT;
+			textValue = format != null? DataHelper.formatDate(d, format) : DataHelper.formatDate(d, defaultFormat);
 		}else if(value instanceof java.time.LocalDate){
 			java.time.LocalDate d = (java.time.LocalDate) value;
 			textValue = format != null ? DataHelper.formatDate(d, format) : DataHelper.formatDate(d, Constants.DEFAULT_DATE_FORMAT);
-		}else if(value instanceof Timestamp){
-			Timestamp t = (Timestamp)value;
-			textValue = format != null? DataHelper.formatDate(t, format) : DataHelper.formatDate(t, Constants.DEFAULT_TIMESTAMP_FORMAT);
 		}else if(value instanceof Instant){
 		    Instant i = (Instant)value;
 		    textValue = format != null? DataHelper.formatInstant(i, format) : DataHelper.formatInstant(i, Constants.DEFAULT_TIMESTAMP_FORMAT);
@@ -147,20 +142,20 @@ public class PdfHelper {
 	public static Paragraph createDisplayParagraph(String value, List<Font> fonts, boolean underLine) {
 		return PdfHelper.createDisplayParagraph(value, fonts, underLine, null);
 	}
-	
+
 	public static Paragraph createDisplayParagraph(String value, List<Font> fonts, boolean underLine, TableHeader header) {
         if (StringUtils.isBlank(value)) {
             return new Paragraph(new Chunk());
         }
-        
+
         FontSelector selector = new FontSelector();
         for (Font f : fonts) {
             selector.addFont(f);
         }
         Phrase phrase = selector.process(value);
-        
+
         Paragraph p = new Paragraph();
-        
+
         float actualWidth = 0f;
         for (Chunk c : phrase.getChunks()) {
             if (underLine) {
