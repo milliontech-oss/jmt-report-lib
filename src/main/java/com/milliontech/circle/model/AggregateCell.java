@@ -13,7 +13,7 @@ public class AggregateCell {
 	private int column;
 	private String mode;
 	private String format;
-	
+	private String align;
 	private List calValList;
 	
 	public AggregateCell(){
@@ -37,6 +37,12 @@ public class AggregateCell {
 	}
 	public void setFormat(String format) {
 		this.format = format;
+	}
+	public String getAlign() {
+		return align;
+	}
+	public void setAlign(String align) {
+		this.align = align;
 	}
 	public List getCalValList() {
 		return calValList;

@@ -22,6 +22,7 @@ public class AggregateCellXmlNodeConverter implements XmlNodeConverter<Aggregate
 		cell.setColumn(DataHelper.getInteger(elmt.getAttribute("column"), 0));
 		cell.setMode(DataHelper.getString(elmt.getAttribute("mode"), null));
 		cell.setFormat(DataHelper.getString(elmt.getAttribute("format"), null));
+		cell.setAlign(DataHelper.getString(elmt.getAttribute("align"), null));
 	}
 
 }

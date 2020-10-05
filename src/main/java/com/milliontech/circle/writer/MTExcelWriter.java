@@ -31,6 +31,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.AreaReference;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.SheetUtil;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.util.CodePageUtil;
@@ -74,6 +75,8 @@ public class MTExcelWriter implements MTWriter{
 	private CellStyle TABLE_TITLE_STYLE;
 	private CellStyle SUMMARY_CELL_LEFT_STYLE;
 	private CellStyle SUMMARY_CELL_RIGHT_STYLE;
+	private CellStyle SUMMARY_CELL_HIGHLIGHT_LEFT_STYLE;
+	private CellStyle SUMMARY_CELL_HIGHLIGHT_RIGHT_STYLE;
 	private DataFormat format;
 	private Map<String, CellStyle> styleMap;
 
@@ -176,6 +179,8 @@ public class MTExcelWriter implements MTWriter{
 		this.TABLE_TITLE_STYLE = ExcelHelper.createTableTitleStyle(wb, data, setting);
 		this.SUMMARY_CELL_LEFT_STYLE = ExcelHelper.createSummaryCellStyle(wb, data, setting, Constants.ALIGN_LEFT, false);
 		this.SUMMARY_CELL_RIGHT_STYLE = ExcelHelper.createSummaryCellStyle(wb, data, setting, Constants.ALIGN_RIGHT, false);
+		this.SUMMARY_CELL_HIGHLIGHT_LEFT_STYLE = ExcelHelper.createSummaryCellStyle(wb, data, setting, Constants.ALIGN_LEFT, true);
+		this.SUMMARY_CELL_HIGHLIGHT_RIGHT_STYLE = ExcelHelper.createSummaryCellStyle(wb, data, setting, Constants.ALIGN_RIGHT, true);
 		this.format = wb.createDataFormat();
 		
 		if(this.wb instanceof HSSFWorkbook){
@@ -556,26 +561,27 @@ public class MTExcelWriter implements MTWriter{
 				Cell cell = row.createCell(c.getStart());
 				cell.setCellValue(c.getTitle());
 				if(c.getAlign()!=null && Constants.ALIGN_LEFT.equalsIgnoreCase(c.getAlign())){
-					cell.setCellStyle(SUMMARY_CELL_LEFT_STYLE);
+					cell.setCellStyle( (sRow.isHightlight()) ? SUMMARY_CELL_HIGHLIGHT_LEFT_STYLE : SUMMARY_CELL_LEFT_STYLE);
 				}else{
-					cell.setCellStyle(SUMMARY_CELL_RIGHT_STYLE);
-				}
-				if(sRow.isHightlight()){
-					ExcelHelper.setSummaryRowHightlight(cell.getCellStyle());
+					cell.setCellStyle( (sRow.isHightlight()) ? SUMMARY_CELL_HIGHLIGHT_RIGHT_STYLE : SUMMARY_CELL_RIGHT_STYLE);
 				}
 
 				for(int i=c.getStart()+1; i<=c.getEnd(); i++){
 
 					Cell spaceCell = row.createCell(i);
 					if(c.getAlign()!=null && Constants.ALIGN_LEFT.equalsIgnoreCase(c.getAlign())){
-						spaceCell.setCellStyle(SUMMARY_CELL_LEFT_STYLE);
+						spaceCell.setCellStyle( (sRow.isHightlight()) ? SUMMARY_CELL_HIGHLIGHT_LEFT_STYLE : SUMMARY_CELL_LEFT_STYLE);
 					}else{
-						spaceCell.setCellStyle(SUMMARY_CELL_RIGHT_STYLE);
+						spaceCell.setCellStyle( (sRow.isHightlight()) ? SUMMARY_CELL_HIGHLIGHT_RIGHT_STYLE : SUMMARY_CELL_RIGHT_STYLE);
 					}
 
 				}
 
-				sheet.addMergedRegion(new CellRangeAddress(cell.getRowIndex(), cell.getRowIndex(), c.getStart(), c.getEnd()));
+				// single cell title cell
+				if (c.getStart() != c.getEnd()){
+					sheet.addMergedRegion(new CellRangeAddress(cell.getRowIndex(), cell.getRowIndex(), c.getStart(), c.getEnd()));
+				}
+				
 			}
 
 			for(Iterator aIter = sRow.getAggregateCellList().iterator(); aIter.hasNext();){
@@ -623,13 +629,15 @@ public class MTExcelWriter implements MTWriter{
 					}
 
 				}
-
-				cell.setCellStyle(SUMMARY_CELL_LEFT_STYLE);
-				if(sRow.isHightlight()){
-					ExcelHelper.setSummaryRowHightlight(cell.getCellStyle());
+				
+				if (StringUtils.isBlank(c.getAlign()) || Constants.ALIGN_LEFT.equalsIgnoreCase(c.getAlign())) {
+					cell.setCellStyle( (sRow.isHightlight()) ? SUMMARY_CELL_HIGHLIGHT_LEFT_STYLE : SUMMARY_CELL_LEFT_STYLE);
+				} else {
+					cell.setCellStyle( (sRow.isHightlight()) ? SUMMARY_CELL_HIGHLIGHT_RIGHT_STYLE : SUMMARY_CELL_RIGHT_STYLE);
 				}
-				if(c.getFormat() != null){
-					cell.getCellStyle().setDataFormat(format.getFormat(c.getFormat()));
+
+				if (StringUtils.isNotBlank(c.getFormat())) {
+					CellUtil.setCellStyleProperty(cell, "dataFormat", format.getFormat(c.getFormat()));
 				}
 
 			}
@@ -648,10 +656,11 @@ public class MTExcelWriter implements MTWriter{
 						}
 						cell.setCellStyle(columnStyle);
 					}else{
-						cell.setCellStyle(SUMMARY_CELL_LEFT_STYLE);
-					}
-					if(sRow.isHightlight()){
-						ExcelHelper.setSummaryRowHightlight(cell.getCellStyle());
+						if (StringUtils.isBlank(o.getAlign()) || Constants.ALIGN_LEFT.equalsIgnoreCase(o.getAlign())) {
+							cell.setCellStyle( (sRow.isHightlight()) ? SUMMARY_CELL_HIGHLIGHT_LEFT_STYLE : SUMMARY_CELL_LEFT_STYLE);
+						} else {
+							cell.setCellStyle( (sRow.isHightlight()) ? SUMMARY_CELL_HIGHLIGHT_RIGHT_STYLE : SUMMARY_CELL_RIGHT_STYLE);
+						}
 					}
 
 					ExcelHelper.setCellValue(dataRow.getClass(),dataRow, o.getMethod(), o.getProperty(), cell, format, null, data.getRemapValueMap());

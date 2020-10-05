@@ -338,7 +338,7 @@ public class ExcelHelper {
 		return style;
 	}
 
-	public static void setSummaryRowHightlight(CellStyle style){
+	private static void setSummaryRowHightlight(CellStyle style){
 		style.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
 		style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 	}
