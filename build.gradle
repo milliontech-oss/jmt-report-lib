@@ -1,31 +1,10 @@
 apply plugin: 'java'
 apply plugin: 'java-library'
-apply plugin: 'eclipse'
 apply plugin: 'project-report' // use `gradlew htmlDependencyReport` to view the graphs
 apply plugin: 'maven-publish'
 
-eclipse {
-    classpath{
-        file {
-            whenMerged { classpath ->
-                def paths = [
-                    'src/main/java' : 'build/classes/java/main',
-                    'src/test/java' : 'build/classes/java/test',
-                    'src/main/resources': 'build/resources/main'
-                ]
-                classpath.entries.each {
-                    def p = paths[it.path]
-                    if(p) it.output = p
-                }
-            }
-        }
-    }
-}
-
-
-
 group = 'com.milliontech'
-version = '4.2.2'
+version = '4.2.3'
 sourceCompatibility = 1.8
 
 println "Gradle Version: ${project.getGradle().getGradleVersion().toString()}"

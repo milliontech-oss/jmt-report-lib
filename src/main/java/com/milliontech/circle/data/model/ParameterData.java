@@ -23,6 +23,7 @@ public class ParameterData {
     private String dataTableTitleListStr;
     private String headerTitle;
 
+    private Float fontSizePrintTimeHeader;
     private Float fontSizeTitle;
     private Float fontSizeCriteria;
     private Float fontSizeColumnHeader;
@@ -120,6 +121,12 @@ public class ParameterData {
     }
     public void setHeaderTitle(String headerTitle) {
         this.headerTitle = headerTitle;
+    }
+    public Float getFontSizePrintTimeHeader(){
+        return fontSizePrintTimeHeader;
+    }
+    public void setFontSizePrintTimeHeader(Float fontSizePrintTimeHeader) {
+        this.fontSizePrintTimeHeader = fontSizePrintTimeHeader;
     }
     public Float getFontSizeTitle() {
         return fontSizeTitle;

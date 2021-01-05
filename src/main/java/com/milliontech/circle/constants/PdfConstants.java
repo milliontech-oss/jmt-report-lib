@@ -8,6 +8,7 @@ public class PdfConstants {
 	public static final float DEFAULT_TITLE_FONT_SIZE = 26f;
 	public static final float DEFAULT_TABLE_HEADER_SIZE = 10f;
 	public static final float DEFAULT_TABLE_CONTENT_FONT_SIZE = 10f;
+	public static final float DEFAULT_PRINT_TIME_FONT_SIZE = 8f;
 
 	public static final BaseColor TABLE_HEADER_COLOR = new BaseColor(255, 255, 204);
 	public static final BaseColor SUMMARY_ROW_COLOR = new BaseColor(204, 204, 255);

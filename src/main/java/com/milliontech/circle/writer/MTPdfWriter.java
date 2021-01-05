@@ -1,5 +1,8 @@
 package com.milliontech.circle.writer;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -19,14 +22,18 @@ import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfDate;
 import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.milliontech.circle.constants.Constants;
 import com.milliontech.circle.constants.PdfConstants;
@@ -72,7 +79,7 @@ public class MTPdfWriter implements MTWriter{
 	    TABLE_TITLE_STYLE = new PdfStyle("columnHeader", PdfFontRepository.createFontList(bfList, Optional.ofNullable(data.getFontSizeColumnHeader()).orElse(PdfConstants.DEFAULT_TABLE_HEADER_SIZE), Font.BOLD));
 		CONTENT_STYLE = new PdfStyle("content", PdfFontRepository.createFontList(bfList, Optional.ofNullable(data.getFontSizeContent()).orElse(PdfConstants.DEFAULT_TABLE_CONTENT_FONT_SIZE), Font.NORMAL));
 		SUMMARY_CELL_STYLE = new PdfStyle("summary", PdfFontRepository.createFontList(bfList, Optional.ofNullable(data.getFontSizeContent()).orElse(PdfConstants.DEFAULT_TABLE_CONTENT_FONT_SIZE), Font.NORMAL));
-		HEADER_FOOTER_STYLE = new PdfStyle("headerFooter", PdfFontRepository.createFontList(bfList, 8f, Font.NORMAL));
+		HEADER_FOOTER_STYLE = new PdfStyle("headerFooter", PdfFontRepository.createFontList(bfList, Optional.ofNullable(data.getFontSizePrintTimeHeader()).orElse(PdfConstants.DEFAULT_PRINT_TIME_FONT_SIZE), Font.NORMAL));
 		
 		this.data = data;
 	}
@@ -80,7 +87,9 @@ public class MTPdfWriter implements MTWriter{
 	public void writer(List dataList, ParameterData data, Report report, OutputStream out) throws Exception {
 		this.data = data;
 		Document document = PdfHelper.createDocument(data, report.getReportSetting());
-	    PdfWriter writer = PdfWriter.getInstance(document, out);
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    PdfWriter writer = PdfWriter.getInstance(document, baos);
 	    writer.setPdfVersion(PdfWriter.VERSION_1_7);
 	    writer.setPageEvent(new HeaderFooter(data, report.getReportSetting(), HEADER_FOOTER_STYLE, HEADER_FOOTER_STYLE));
 	    document.open();
@@ -124,8 +133,32 @@ public class MTPdfWriter implements MTWriter{
 			data.getCustomPdfFooter().writeCustomFooter(data, document, writer);
 		}
 
+		int pageCount = writer.getPageNumber();
+		
 	    document.close();
+	    
+	    byte[] pdfAsBytes = baos.toByteArray();
+	    writePageNumber(pdfAsBytes, pageCount, out);
 	}
+	
+	private void writePageNumber(byte[] pdfAsBytes, int pageCount, OutputStream out) throws IOException, DocumentException {
+	    PdfReader reader = new PdfReader(pdfAsBytes);
+	    Rectangle pageSize = reader.getPageSizeWithRotation(1);
+	    float middle = pageSize.getWidth() / 2;
+	    
+	    PdfStamper stamper = new PdfStamper(reader, out);
+	    for (int i = 1; i <= pageCount; i++) {
+	        Paragraph p = PdfHelper.createDisplayParagraph(
+	                String.format(data.getPageLabel() + " %d  / %d", i, pageCount), 
+	                HEADER_FOOTER_STYLE.getFontList(), 
+	                false
+	        );
+	        ColumnText.showTextAligned(stamper.getOverContent(i), Element.ALIGN_CENTER, p, middle, 12, 0);
+	    }
+	    stamper.close();
+	}
+	
+	
 
 	private void writeMultipleTables(List dataList, ParameterData data, Report report, Document document) throws Exception, DocumentException {
 		MultiTableHelper helper = new MultiTableHelper();

@@ -9,6 +9,7 @@ public class ReportWriterConstant {
 	public static final String PAGE_ROTATE = "jmtReportPageRotate";
 	public static final String PRINT_TIME_LABEL = "jmtReportPrintTimeLabel";
 
+	public static final String FONT_SIZE_PRINT_TIME_HEADER = "jmtReportFontSizePrintTimeHeader";
 	public static final String FONT_SIZE_TITLE = "jmtReportFontSizeTitle";
 	public static final String FONT_SIZE_CRITERIA = "jmtReportFontSizeCriteria";
 	public static final String FONT_SIZE_COLUMN_HEADER = "jmtReportFontSizeColumnHeader";

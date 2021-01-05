@@ -45,6 +45,7 @@ public class ParameterDataConverter {
 		data.setDataTableTitleListStr((String)parameter.get(ReportWriterConstant.TITLE_FIELD));
 		data.setHeaderTitle((String)parameter.get(ReportWriterConstant.HEADER));
 
+		data.setFontSizePrintTimeHeader((Float)parameter.get(ReportWriterConstant.FONT_SIZE_PRINT_TIME_HEADER));
 		data.setFontSizeTitle((Float)parameter.get(ReportWriterConstant.FONT_SIZE_TITLE));
 		data.setFontSizeCriteria((Float)parameter.get(ReportWriterConstant.FONT_SIZE_CRITERIA));
 		data.setFontSizeColumnHeader((Float)parameter.get(ReportWriterConstant.FONT_SIZE_COLUMN_HEADER));

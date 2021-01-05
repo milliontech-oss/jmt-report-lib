@@ -28,7 +28,6 @@ import com.milliontech.circle.model.ReportSetting;
 
 public class HeaderFooter extends PdfPageEventHelper {
 		
-	private PdfTemplate total;	
 	private ParameterData data;
 	private ReportSetting setting;
 	private String printDate;
@@ -44,8 +43,6 @@ public class HeaderFooter extends PdfPageEventHelper {
 	}
 
 	public void onOpenDocument(PdfWriter writer, Document document) {
-        total = writer.getDirectContent().createTemplate(30, 12);
-
         List<String> rightHeaderList = new ArrayList<String>();
 
         String restrictedLabel = null;
@@ -77,59 +74,22 @@ public class HeaderFooter extends PdfPageEventHelper {
         printDate = StringUtils.join(rightHeaderList, "\n");
     }
 	
-	public void onEndPage(PdfWriter writer, Document document) {        
-        try {
-        	//Header          	
-        	PdfPTable headerTable = new PdfPTable(1);
-            headerTable.setWidthPercentage(100f);
-            headerTable.setTotalWidth(document.getPageSize().getWidth()-8);            
-            headerTable.getDefaultCell().setFixedHeight(16);
-            headerTable.getDefaultCell().setBorder(Rectangle.BOX);            
-            headerTable.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
-            
-            PdfPCell printDateCell = new PdfPCell();            
-            Paragraph pdate = PdfHelper.createDisplayParagraph(printDate, headerStyle.getFontList(), false);
-            printDateCell.setPhrase(pdate);
-            printDateCell.setBorder(Rectangle.NO_BORDER);
-            printDateCell.setHorizontalAlignment(PdfPCell.ALIGN_RIGHT);                        
-            headerTable.addCell(printDateCell);
-            
-            headerTable.writeSelectedRows(0, -1, 0, document.getPageSize().getHeight()-10, writer.getDirectContent());              	        	
-        	
-        	//Footer
-        	PdfPTable footerTable = new PdfPTable(2);
-            footerTable.setWidths(new int[]{20, 2});
-            footerTable.setTotalWidth(document.getPageSize().getWidth()/2+50);
-            footerTable.setLockedWidth(true);
-            footerTable.getDefaultCell().setFixedHeight(20);
-            footerTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);            
-            footerTable.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
-          
-            PdfPCell pageNumCell = new PdfPCell();            
-            Paragraph ppage = PdfHelper.createDisplayParagraph(String.format(data.getPageLabel()+" %d  /", new Object[]{new Integer(writer.getPageNumber())}), footerStyle.getFontList(), false);
-            pageNumCell.setPhrase(ppage);            
-            pageNumCell.setBorder(Rectangle.NO_BORDER);
-            pageNumCell.setHorizontalAlignment(PdfPCell.ALIGN_RIGHT);
-            footerTable.addCell(pageNumCell);
-            
-            PdfPCell totalCell = new PdfPCell(Image.getInstance(total));
-            totalCell.setBorder(Rectangle.NO_BORDER);            
-            footerTable.addCell(totalCell);
-            
-            if(setting.isShowPageNumber()){
-            	footerTable.writeSelectedRows(0, -1, 0, 20, writer.getDirectContent());
-            }
-        }
-        catch(DocumentException de) {
-            throw new ExceptionConverter(de);
-        }
-    }
-		
-	public void onCloseDocument(PdfWriter writer, Document document) {
-		if(setting.isShowPageNumber()){
-			Paragraph p = PdfHelper.createDisplayParagraph(String.valueOf(writer.getPageNumber()), footerStyle.getFontList(), false);
-	        ColumnText.showTextAligned(total, Element.ALIGN_LEFT, p, 1, 2, 0);
-		}
-    }
-    	
+	public void onEndPage(PdfWriter writer, Document document) {
+        //Header            
+        PdfPTable headerTable = new PdfPTable(1);
+        headerTable.setWidthPercentage(100f);
+        headerTable.setTotalWidth(document.getPageSize().getWidth()-8);            
+        headerTable.getDefaultCell().setFixedHeight(16);
+        headerTable.getDefaultCell().setBorder(Rectangle.BOX);            
+        headerTable.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
+        
+        PdfPCell printDateCell = new PdfPCell();            
+        Paragraph pdate = PdfHelper.createDisplayParagraph(printDate, headerStyle.getFontList(), false);
+        printDateCell.setPhrase(pdate);
+        printDateCell.setBorder(Rectangle.NO_BORDER);
+        printDateCell.setHorizontalAlignment(PdfPCell.ALIGN_RIGHT);                        
+        headerTable.addCell(printDateCell);
+        
+        headerTable.writeSelectedRows(0, -1, 0, document.getPageSize().getHeight()-10, writer.getDirectContent());                              
+	}
 }
