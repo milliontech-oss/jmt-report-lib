@@ -4,7 +4,7 @@ apply plugin: 'project-report' // use `gradlew htmlDependencyReport` to view the
 apply plugin: 'maven-publish'
 
 group = 'com.milliontech'
-version = '4.2.4'
+version = '4.2.5'
 sourceCompatibility = 1.8
 
 println "Gradle Version: ${project.getGradle().getGradleVersion().toString()}"
