@@ -19,6 +19,7 @@ public class ParameterDataConstants {
 	public static final String CUSTOM_EXCEL_PRINT_PAGE_SETUP = "jmtReportExcelPrintPageSetup";
 	public static final String CUSTOM_EXCEL_CRITERIA = "jmtReportExcelCriteria";
 
+	public static final String EXCEL_DEFAULT_CELL_WRAP_TEXT = "jmtExcelDefaultCellWrapText";
 	public static final String SXSSF_TMP_FILE_PATH = "jmtSXSSFTmpFilePath";
 	public static final String SXSSF_ROW_ACCESS_WINDOW_SIZE = "jmtSXSSFRowAccessWindowSize";
 	public static final String SXSSF_COMPRESS_TMP_FILE = "jmtSXSSFCompressTmpFile";

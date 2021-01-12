@@ -501,14 +501,24 @@ public class MTExcelWriter implements MTWriter{
 
 				boolean isHighlight = ValueHelper.isHighlight(obj.getClass(), obj, header.getHighlightFld());
 				boolean isItalics = ValueHelper.isItalics(obj.getClass(), obj, header.getItalicsFld());
-
+				
 				String styleKey = MessageFormat.format("ColumnContent_{0}_Font_{1}_Highlight_{2}",
 						new Object[] { header.getColumn(), (isItalics ? "I" : ""), (isHighlight ? header.getHighlightColor() : "NA") });
 
 				CellStyle columnStyle = styleMap.get(styleKey);
 				if(columnStyle==null){
+				    // no word-wrap if width is not defined
+				    boolean isWordWrap = false;
+				    if (header.getXlsWidth() > 0) {
+				        isWordWrap = Optional.ofNullable(header.isWrapText()).orElse(report.getReportSetting().isExcelDefaultCellWrapText());
+				    }
+				    if (header.getXlsWidth() <= 0 && header.isWrapText()) {
+				        log.warn(String.format("column: %s does not have width but enabled wrapText, setting wrapText to false", header.getColumn()));
+				        header.setWrapText(false);
+				        isWordWrap = false;
+				    }
 					columnStyle = ExcelHelper.createContentStyle(wb, data, report.getReportSetting(), header.getFormat(), 
-							isHighlight, header.getHighlightColor(), isItalics, header.isWrapText(), header.getAlign());
+							isHighlight, header.getHighlightColor(), isItalics, isWordWrap, header.getAlign());
 					styleMap.put(styleKey, columnStyle);
 				}
 				cell.setCellStyle(columnStyle);

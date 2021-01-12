@@ -46,6 +46,7 @@ public class ReportSetting {
 	private String tableHeaderColor;
 	private boolean pdfAlterRowColorOff;
 
+	private boolean excelDefaultCellWrapText;
 	private boolean excelAutoFilter;
 	private boolean excelFreezeHeader;
 	private int excelAutosizeMargin;
@@ -81,6 +82,7 @@ public class ReportSetting {
 		showRowNo = true;
 		pdfAlterRowColorOff = false;
 
+		excelDefaultCellWrapText = false;
 		excelAutoFilter = true;
 		excelFreezeHeader = true;
 		excelAutosizeMargin = 5;
@@ -324,8 +326,16 @@ public class ReportSetting {
 	public void setPdfAlterRowColorOff(boolean pdfAlterRowColorOff) {
 		this.pdfAlterRowColorOff = pdfAlterRowColorOff;
 	}
+	
+	public boolean isExcelDefaultCellWrapText() {
+        return excelDefaultCellWrapText;
+    }
 
-	public boolean isExcelAutoFilter() {
+    public void setExcelDefaultCellWrapText(boolean excelDefaultCellWrapText) {
+        this.excelDefaultCellWrapText = excelDefaultCellWrapText;
+    }
+
+    public boolean isExcelAutoFilter() {
 		return excelAutoFilter;
 	}
 

@@ -17,6 +17,7 @@ import com.milliontech.circle.data.model.ParameterData;
 import com.milliontech.circle.helper.DataHelper;
 import com.milliontech.circle.helper.TableHeaderHelper;
 import com.milliontech.circle.model.Report;
+import com.milliontech.circle.model.ReportSetting;
 import com.milliontech.circle.xml.converter.XmlNodeConverter;
 
 public class XmlReader {
@@ -74,8 +75,21 @@ public class XmlReader {
                 TableHeaderHelper.createTableHeaderForNoXmlDefinition(data, report);
             }
 
-            if (!hasReportSettingNode && parameter.containsKey(ParameterDataConstants.PDF_DEFAULT_SHOW_ROW_NO)){
-                report.getReportSetting().setShowRowNo(DataHelper.isTrue((String)parameter.get(ParameterDataConstants.PDF_DEFAULT_SHOW_ROW_NO), true));
+            /*
+             * in general this should be configured directly via `ReportSetting` node
+             * legacy project implemented before 2012 does not have `ReportSetting` node defined the XML file
+             * this if-clause is to "patch" the `ReportSetting` from various parameter data map
+             * e.g. CTMS, BSFE, CSMS
+             */
+            if (!hasReportSettingNode){
+                ReportSetting setting = report.getReportSetting();
+                
+                if (parameter.containsKey(ParameterDataConstants.PDF_DEFAULT_SHOW_ROW_NO)) {
+                    setting.setShowRowNo(DataHelper.isTrue((String)parameter.get(ParameterDataConstants.PDF_DEFAULT_SHOW_ROW_NO), true));
+                }
+                if (parameter.containsKey(ParameterDataConstants.EXCEL_DEFAULT_CELL_WRAP_TEXT)) {
+                    setting.setExcelDefaultCellWrapText(DataHelper.isTrue((String)parameter.get(ParameterDataConstants.EXCEL_DEFAULT_CELL_WRAP_TEXT), false));
+                }
             }
 
         } catch (Exception ex) {

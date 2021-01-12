@@ -102,12 +102,15 @@ public class DataHelper {
 		}
 
 	}
+	
+	public static boolean isTrue(String value) {
+	    return "true".equalsIgnoreCase(value) || "Y".equalsIgnoreCase(value);
+	}
 
 	public static boolean isTrue(String value, boolean defaultValue) {
 		if (value == null)
 			return defaultValue;
-
-		return "true".equalsIgnoreCase(value) || "Y".equalsIgnoreCase(value);
+		return isTrue(value);
 	}
 
 	public static String getPrintDateStr(java.util.Date date, String format){

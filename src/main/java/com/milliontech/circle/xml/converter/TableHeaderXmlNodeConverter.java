@@ -269,7 +269,9 @@ public class TableHeaderXmlNodeConverter implements XmlNodeConverter<TableHeader
                 header.setXlsWidth(header.getWidth());
             }
         }
-        header.setWrapText(DataHelper.isTrue(elmt.getAttribute("wrapText"), false));
+        if (elmt.hasAttribute("wrapText")) {
+            header.setWrapText(DataHelper.isTrue(elmt.getAttribute("wrapText"), false));
+        }
         header.setHidden(DataHelper.isTrue(elmt.getAttribute("hidden"), false));
         
         header.setXmlRemap(DataHelper.getString(elmt.getAttribute("xmlRemap"), null));

@@ -29,7 +29,7 @@ public class TableHeader implements Comparable, MessageKeyTitleElement, TableCol
 	private String highlightFld;
 	private String highlightColor;
 	private String italicsFld;
-	private boolean wrapText;
+	private Boolean wrapText;
 	private boolean hidden;
 	private String xmlRemap;
 
@@ -171,11 +171,11 @@ public class TableHeader implements Comparable, MessageKeyTitleElement, TableCol
 	public void setItalicsFld(String italicsFld) {
 		this.italicsFld = italicsFld;
 	}
-	public boolean isWrapText() {
+	public Boolean isWrapText() {
 		return wrapText;
 	}
 
-	public void setWrapText(boolean wrapText) {
+	public void setWrapText(Boolean wrapText) {
 		this.wrapText = wrapText;
 	}
 

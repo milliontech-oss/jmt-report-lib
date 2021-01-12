@@ -130,6 +130,10 @@ public class ReportSettingXmlNodeConverter implements XmlNodeConverter<ReportSet
 		if(elmt.hasAttribute("pdfAlterRowColorOff")){
 			setting.setPdfAlterRowColorOff(DataHelper.isTrue(elmt.getAttribute("pdfAlterRowColorOff"), false));
 		}
+		
+		if (elmt.hasAttribute("excelDefaultCellWrapText")) {
+		    setting.setExcelDefaultCellWrapText(DataHelper.isTrue(elmt.getAttribute("excelDefaultCellWrapText"), false));
+		}
 
 		if(elmt.hasAttribute("excelAutoFilter")){
 			setting.setExcelAutoFilter(DataHelper.isTrue(elmt.getAttribute("excelAutoFilter"), true));
