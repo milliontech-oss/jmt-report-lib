@@ -4,7 +4,7 @@ apply plugin: 'project-report' // use `gradlew htmlDependencyReport` to view the
 apply plugin: 'maven-publish'
 
 group = 'com.milliontech'
-version = '4.2.5'
+version = '4.2.6'
 sourceCompatibility = 1.8
 
 println "Gradle Version: ${project.getGradle().getGradleVersion().toString()}"
@@ -41,7 +41,7 @@ publishing {
     }
 }
 
-def apachePOIVersion = '4.1.2'
+def apachePOIVersion = '5.0.0'
 def slf4jVersion = '1.7.30'
 
 java {
@@ -49,7 +49,6 @@ java {
         usingSourceSet(sourceSets.main)
     }
 }
-
 
 dependencies {
     modules {
@@ -61,18 +60,12 @@ dependencies {
     // slf4j
     api("org.slf4j:slf4j-api:${slf4jVersion}");
 
-    //Report
-    api("org.apache.poi:poi:${apachePOIVersion}")
-    api("org.apache.poi:poi-ooxml:${apachePOIVersion}")
-    api("org.apache.poi:poi-ooxml-schemas:${apachePOIVersion}")
+    //POI
+    implementation("org.apache.poi:poi:${apachePOIVersion}")
+    implementation("org.apache.poi:poi-ooxml:${apachePOIVersion}")
+    implementation("org.apache.poi:poi-ooxml-lite:${apachePOIVersion}")
+    implementation("org.apache.poi:poi-scratchpad:${apachePOIVersion}")
 
-    // for OOXML writing
-    /*
-    implementation('xerces:xercesImpl:2.12.0');
-    implementation('xalan:xalan:2.7.2');
-    implementation('xalan:serializer:2.7.2');
-    implementation('xml-resolver:xml-resolver:1.2');
-*/
     api('com.itextpdf:itextpdf:5.5.13')
     api('com.itextpdf:itext-pdfa:5.5.13')
     api('com.itextpdf:itext-asian:5.2.0')
