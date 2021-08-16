@@ -64,6 +64,7 @@ public class ParameterData {
     private boolean sxssfKeepTmpFile;
     
     private List<String> fontFilePathList;
+    private String defaultFontFamily;
     private Map<String, String> msgKeyPropMap;
 
     public ParameterData(){
@@ -83,6 +84,7 @@ public class ParameterData {
         sxssfKeepTmpFile = false;
         useWidthIfEmpty = false;
         fontFilePathList = new ArrayList<String>(0);
+        defaultFontFamily = null;
         msgKeyPropMap = null;
     }
 
@@ -320,7 +322,14 @@ public class ParameterData {
     public void setMsgKeyPropMap(Map<String, String> msgKeyPropMap) {
         this.msgKeyPropMap = msgKeyPropMap;
     }
-    public String toString() {
+	public String getDefaultFontFamily() {
+		return defaultFontFamily;
+	}
+	public void setDefaultFontFamily(String defaultFontFamily) {
+		this.defaultFontFamily = defaultFontFamily;
+	}
+
+	public String toString() {
         return ReflectionToStringBuilder.toString(this);
     }
 }

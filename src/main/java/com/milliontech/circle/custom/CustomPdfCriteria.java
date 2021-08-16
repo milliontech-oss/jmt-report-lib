@@ -1,6 +1,6 @@
 package com.milliontech.circle.custom;
 
-import com.itextpdf.text.Document;
+import com.itextpdf.layout.Document;
 import com.milliontech.circle.data.model.ParameterData;
 
 public interface CustomPdfCriteria {

@@ -1,7 +1,7 @@
 package com.milliontech.circle.custom;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
 import com.milliontech.circle.data.model.ParameterData;
 
 public interface CustomPdfFooter {

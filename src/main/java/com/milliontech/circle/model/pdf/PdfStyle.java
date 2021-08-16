@@ -2,38 +2,38 @@ package com.milliontech.circle.model.pdf;
 
 import java.util.List;
 
-import com.itextpdf.text.Font;
+import com.milliontech.circle.helper.PdfFontInfo;
 
 public class PdfStyle {
 
     private String name;
-    private List<Font> fontList;
+    private List<PdfFontInfo> fontInfoList;
     private float size;
-    private int style;
-    
-    public PdfStyle(String name, List<Font> fontList) {
-        this(name, fontList, fontList.get(0).getSize(), fontList.get(0).getStyle());
+    private boolean bold;
+
+    public PdfStyle(String name, List<PdfFontInfo> fontInfoList) {
+        this(name, fontInfoList, fontInfoList.get(0).getFontSize(), fontInfoList.get(0).isBold());
     }
-    
-    public PdfStyle(String name, List<Font> fontList, float size, int style) {
+
+    public PdfStyle(String name, List<PdfFontInfo> fontInfoList, float size, boolean bold) {
         super();
         this.name = name;
-        this.fontList = fontList;
+        this.fontInfoList = fontInfoList;
         this.size = size;
-        this.style = style;
+        this.bold = bold;
     }
-    
+
     public String getName() {
         return name;
     }
-    public List<Font> getFontList() {
-        return fontList;
+    public List<PdfFontInfo> getFontInfoList() {
+        return fontInfoList;
     }
     public float getSize() {
         return size;
     }
-    public int getStyle() {
-        return style;
+    public boolean isBold() {
+        return bold;
     }
-    
+
 }

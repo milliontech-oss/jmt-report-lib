@@ -101,7 +101,8 @@ public class TableHeaderXmlNodeConverter implements XmlNodeConverter<TableHeader
         try {
             Method getter = null;
             if (StringUtils.isNotBlank(header.getProperty())) {
-                PropertyDescriptor pd = new PropertyDescriptor(header.getProperty(), clazz);
+            	// cast the first parameter to String to workaround JDK issue: https://bugs.openjdk.java.net/browse/JDK-8212636
+                PropertyDescriptor pd = new PropertyDescriptor((String)header.getProperty(), clazz);
                 getter = pd.getReadMethod();
             } else {
                 getter = clazz.getMethod(header.getMethod(), (Class) null);

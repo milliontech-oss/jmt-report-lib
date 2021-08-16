@@ -32,11 +32,13 @@ public class TableHeader implements Comparable, MessageKeyTitleElement, TableCol
 	private Boolean wrapText;
 	private boolean hidden;
 	private String xmlRemap;
+	private float maxFontSize;
 
 	public TableHeader(){
 		subColumn = 0;
 		mutiTableDummyFld = false;
 		hidden = false;
+		maxFontSize = 0f;
 	}
 
 	public int getColumn() {
@@ -193,6 +195,14 @@ public class TableHeader implements Comparable, MessageKeyTitleElement, TableCol
 
     public void setXmlRemap(String xmlRemap) {
         this.xmlRemap = xmlRemap;
+    }
+
+    public float getMaxFontSize() {
+        return maxFontSize;
+    }
+
+    public void setMaxFontSize(float maxFontSize) {
+        this.maxFontSize = maxFontSize;
     }
 
     public String toString() {

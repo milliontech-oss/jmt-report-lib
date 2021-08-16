@@ -110,6 +110,9 @@ public class ParameterDataConverter {
 		if(parameter.get(ParameterDataConstants.FONT_FILE_PATH_LIST) != null) {
 		    data.setFontFilePathList((List<String>) parameter.get(ParameterDataConstants.FONT_FILE_PATH_LIST));
 		}
+		if(parameter.get(ParameterDataConstants.DEFUALT_FONT_FAMILY) != null) {
+		    data.setDefaultFontFamily((String) parameter.get(ParameterDataConstants.DEFUALT_FONT_FAMILY));
+		}
 		if(parameter.get(ParameterDataConstants.MSG_KEY_PROP_MAP) != null) {
 		    data.setMsgKeyPropMap((Map<String, String>) parameter.get(ParameterDataConstants.MSG_KEY_PROP_MAP));
 		}
