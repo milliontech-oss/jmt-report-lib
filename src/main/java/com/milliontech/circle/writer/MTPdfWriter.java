@@ -30,10 +30,10 @@ import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.property.Leading;
-import com.itextpdf.layout.property.Property;
-import com.itextpdf.layout.property.TextAlignment;
-import com.itextpdf.layout.property.UnitValue;
+import com.itextpdf.layout.properties.Leading;
+import com.itextpdf.layout.properties.Property;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 import com.milliontech.circle.constants.Constants;
 import com.milliontech.circle.constants.PdfConstants;
 import com.milliontech.circle.data.converter.ParameterDataConverter;
@@ -70,13 +70,13 @@ public class MTPdfWriter implements MTWriter{
 	private PdfStyle SUMMARY_CELL_STYLE;
 	private PdfStyle HEADER_FOOTER_STYLE;
 	private ParameterData data;
-	
+
 	private PdfFontSetting fontSetting;
-	
+
 	public MTPdfWriter(ParameterData data, ReportSetting setting){
-		
+
 		this.fontSetting = PdfFontRepository.getPdfFontSetting(data);
-		
+
         List<PdfFont> bfList = this.fontSetting.getFontList();
         CRITERIA_STYLE = new PdfStyle("criteria", PdfFontRepository.createPdfFontInfoList(bfList, Optional.ofNullable(data.getFontSizeCriteria()).orElse(PdfConstants.DEFAULT_CRITERIA_FONT_SIZE), false));
         HEADER_TITLE_STYLE = new PdfStyle("title", PdfFontRepository.createPdfFontInfoList(bfList, Optional.ofNullable(data.getFontSizeTitle()).orElse(PdfConstants.DEFAULT_TITLE_FONT_SIZE), true));
@@ -84,7 +84,7 @@ public class MTPdfWriter implements MTWriter{
         CONTENT_STYLE = new PdfStyle("content", PdfFontRepository.createPdfFontInfoList(bfList, Optional.ofNullable(data.getFontSizeContent()).orElse(PdfConstants.DEFAULT_TABLE_CONTENT_FONT_SIZE), false));
         SUMMARY_CELL_STYLE = new PdfStyle("summary", PdfFontRepository.createPdfFontInfoList(bfList, Optional.ofNullable(data.getFontSizeContent()).orElse(PdfConstants.DEFAULT_TABLE_CONTENT_FONT_SIZE), false));
         HEADER_FOOTER_STYLE = new PdfStyle("headerFooter", PdfFontRepository.createPdfFontInfoList(bfList, Optional.ofNullable(data.getFontSizePrintTimeHeader()).orElse(PdfConstants.DEFAULT_PRINT_TIME_FONT_SIZE), false));
-        
+
         this.data = data;
     }
 
@@ -92,7 +92,7 @@ public class MTPdfWriter implements MTWriter{
 		this.data = data;
         WriterProperties wp = new WriterProperties();
         wp.setPdfVersion(PdfVersion.PDF_1_7);
-        
+
         //ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PdfWriter writer = new PdfWriter(out, wp);
         PdfDocument pdf = new PdfDocument(writer);
@@ -142,27 +142,27 @@ public class MTPdfWriter implements MTWriter{
         if(data.getCustomPdfFooter()!=null){
             data.getCustomPdfFooter().writeCustomFooter(data, document, writer);
         }
-        
+
         //int pageCount = writer.getPageNum();
 
         footerEvent.writeTotal(pdf);
         document.close();
-	    
+
         // byte[] pdfAsBytes = baos.toByteArray();
         //writePageNumber(pdfAsBytes, pageCount, out);
 	}
-	
+
 	/*
 	private void writePageNumber(byte[] pdfAsBytes, int pageCount, OutputStream out) throws IOException, DocumentException {
 	    PdfReader reader = new PdfReader(pdfAsBytes);
 	    Rectangle pageSize = reader.getPageSizeWithRotation(1);
 	    float middle = pageSize.getWidth() / 2;
-	    
+
 	    PdfStamper stamper = new PdfStamper(reader, out);
 	    for (int i = 1; i <= pageCount; i++) {
 	        Paragraph p = PdfHelper.createDisplayParagraph(
-	                String.format(data.getPageLabel() + " %d  / %d", i, pageCount), 
-	                HEADER_FOOTER_STYLE.getFontList(), 
+	                String.format(data.getPageLabel() + " %d  / %d", i, pageCount),
+	                HEADER_FOOTER_STYLE.getFontList(),
 	                false
 	        );
 	        ColumnText.showTextAligned(stamper.getOverContent(i), Element.ALIGN_CENTER, p, middle, 12, 0);
@@ -215,22 +215,32 @@ public class MTPdfWriter implements MTWriter{
         float tableWidth = document.getPdfDocument().getDefaultPageSize().getWidth() - document.getLeftMargin() - document.getRightMargin();
         float[] widths = getTableColumnWidths(list, noOfColumns, report.getReportSetting(), dataList.size(), tableWidth);
 
-        Table dataTable = new Table(UnitValue.createPercentArray(widths));
+        boolean isUseLargeTable = rowspanMap.isEmpty();
+
+        Table dataTable = new Table(UnitValue.createPercentArray(widths), isUseLargeTable);
         dataTable.setFixedLayout();
-        dataTable.setBorder(new SolidBorder(PdfConstants.DEFAULT_TABLE_BORDER_WIDTH));
         dataTable.setWidth(UnitValue.createPercentValue(100f));
         dataTable.setTextAlignment(TextAlignment.LEFT);
-        dataTable.setMarginTop(3f * PdfConstants.DEFAULT_ITEXT7_TO_5_SPACING_RATIO);
-        dataTable.setMarginBottom(3f * PdfConstants.DEFAULT_ITEXT7_TO_5_SPACING_RATIO);
+        dataTable.setMarginTop((isUseLargeTable ? 1.5f : 3f) * PdfConstants.DEFAULT_ITEXT7_TO_5_SPACING_RATIO);
+        dataTable.setMarginBottom((isUseLargeTable ? 1.5f : 3f) * PdfConstants.DEFAULT_ITEXT7_TO_5_SPACING_RATIO);
 
         if(splitBy!=null){
             PdfHelper.createPdfHeaderCell(dataTable, splitBy, TABLE_TITLE_STYLE, null, BorderType.ALL, Constants.ALIGN_LEFT, null , totalColumns, 1);
         }
         setTableHeader(report, list, dataTable);
-        setTableContent(dataList, list, dataTable, report, rowspanMap);
+
+        if (isUseLargeTable) {
+            document.add(dataTable);
+        }
+
+        setTableContent(dataList, list, dataTable, report, rowspanMap, isUseLargeTable);
         setSummaryRow(data, report, noOfColumns, dataTable, dataList);
 
-        document.add(dataTable);
+        if (isUseLargeTable) {
+            dataTable.complete();
+        } else {
+            document.add(dataTable);
+        }
     }
 
     private void setSummaryRow(ParameterData data, Report report, int noOfColumns, Table dataTable, List dataList) throws Exception {
@@ -414,9 +424,13 @@ public class MTPdfWriter implements MTWriter{
         return methodProperty+"_"+rowIndex.intValue();
     }
 
-    private void setTableContent(List dataList, List list, Table dataTable, Report report, Map rowspanMap) throws Exception {
+    private void setTableContent(List dataList, List list, Table dataTable, Report report, Map rowspanMap, boolean isUseLargeTable) throws Exception {
         int rowIndex = 0;
         for(Iterator iter = dataList.iterator(); iter.hasNext();){
+            if (isUseLargeTable && rowIndex % 50 == 0) {
+                dataTable.flush();
+            }
+
             Object obj = iter.next();
 
             Float grey = (rowIndex % 2 == 1) ? new Float(0.92f) : null;
@@ -472,6 +486,10 @@ public class MTPdfWriter implements MTWriter{
             }
 
             rowIndex++;
+        }
+
+        if (isUseLargeTable) {
+            dataTable.flush();
         }
     }
 
@@ -591,17 +609,6 @@ public class MTPdfWriter implements MTWriter{
                     }
                 }else{
                     PdfHelper.calcWidth(strValue, CONTENT_STYLE.getFontInfoList(), header);
-                }
-
-                for(Iterator sIter = report.getSummaryRowList().iterator();sIter.hasNext();){
-                    SummaryRow row = (SummaryRow)sIter.next();
-                    if(!row.getAggregateCellMap().isEmpty()){
-                        Map map = row.getAggregateCellMap();
-                        AggregateCell aCell = (AggregateCell)map.get(new Integer(colIndex));
-                        if(aCell!=null){
-                            aCell.getCalValList().add(value);
-                        }
-                    }
                 }
                 colIndex++;
             }

@@ -9,7 +9,7 @@ import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.properties.TextAlignment;
 import com.milliontech.circle.data.model.ParameterData;
 import com.milliontech.circle.helper.DataHelper;
 import com.milliontech.circle.helper.PdfHelper;
@@ -46,7 +46,7 @@ public class HeaderEvent implements IEventHandler {
         Canvas canvas = new Canvas(pdfCanvas, pageSize);
         canvas.setFontProvider(fontSetting.getFontProvider());
         canvas.setFontFamily(fontSetting.getDefaultFontFamily());
-        
+
         Paragraph p = PdfHelper.createDisplayParagraph(printDate, headerStyle.getFontInfoList(), false, false);
         p.setMultipliedLeading(0.8f);
 

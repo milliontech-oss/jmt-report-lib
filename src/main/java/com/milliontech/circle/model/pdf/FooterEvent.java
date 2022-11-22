@@ -10,7 +10,7 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.xobject.PdfFormXObject;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.properties.TextAlignment;
 import com.milliontech.circle.data.model.ParameterData;
 import com.milliontech.circle.helper.PdfHelper;
 import com.milliontech.circle.model.ReportSetting;
@@ -48,7 +48,7 @@ public class FooterEvent implements IEventHandler {
             Canvas canvas = new Canvas(pdfCanvas, pageSize);
             canvas.setFontProvider(fontSetting.getFontProvider());
             canvas.setFontFamily(fontSetting.getDefaultFontFamily());
-            
+
             Paragraph p = PdfHelper.createDisplayParagraph(String.format(data.getPageLabel() + " %d  /", pageNumber), footerStyle.getFontInfoList(), false, false);
 
             float x = pageSize.getWidth() / 2;
@@ -63,7 +63,7 @@ public class FooterEvent implements IEventHandler {
             Canvas canvas = new Canvas(placeholder, pdf);
             canvas.setFontProvider(fontSetting.getFontProvider());
             canvas.setFontFamily(fontSetting.getDefaultFontFamily());
-            
+
             Paragraph p = PdfHelper.createDisplayParagraph(String.valueOf(pdf.getNumberOfPages()), footerStyle.getFontInfoList(), false, false);
             canvas.showTextAligned(p, 0, descent, TextAlignment.LEFT);
         }

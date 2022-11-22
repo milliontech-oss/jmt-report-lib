@@ -4,7 +4,7 @@ apply plugin: 'project-report' // use `gradlew htmlDependencyReport` to view the
 apply plugin: 'maven-publish'
 
 group = 'com.milliontech'
-version = '5.0.0'
+version = '5.1.1'
 sourceCompatibility = 1.8
 
 println "Gradle Version: ${project.getGradle().getGradleVersion().toString()}"
@@ -41,9 +41,9 @@ publishing {
     }
 }
 
-def apachePOIVersion = '5.0.0'
-def slf4jVersion = '1.7.30'
-def iTextVersion = '7.1.16'
+def apachePOIVersion = '5.2.2'
+def slf4jVersion = '1.7.36'
+def iTextVersion = '7.2.1'
 
 java {
     registerFeature("csvSupport") {
@@ -62,31 +62,27 @@ dependencies {
     api("org.slf4j:slf4j-api:${slf4jVersion}");
 
     //POI
-    implementation("org.apache.poi:poi:${apachePOIVersion}")
-    implementation("org.apache.poi:poi-ooxml:${apachePOIVersion}")
-    implementation("org.apache.poi:poi-ooxml-lite:${apachePOIVersion}")
-    implementation("org.apache.poi:poi-scratchpad:${apachePOIVersion}")
+    api("org.apache.poi:poi:${apachePOIVersion}")
+    api("org.apache.poi:poi-ooxml:${apachePOIVersion}")
+    api("org.apache.poi:poi-ooxml-lite:${apachePOIVersion}")
 
     //iText
 	api("com.itextpdf:itext7-core:${iTextVersion}")
-	api("com.itextpdf:kernel:${iTextVersion}")
-	api("com.itextpdf:io:${iTextVersion}")
-	api("com.itextpdf:layout:${iTextVersion}")
-	api("com.itextpdf:pdfa:${iTextVersion}")
-	api("com.itextpdf:font-asian:${iTextVersion}")
-	api("com.itextpdf:hyph:${iTextVersion}")
 
     csvSupportApi('net.sf.supercsv:super-csv:2.4.0')
 
-    api('org.jodd:jodd-bean:5.0.6')
-    api('org.apache.commons:commons-lang3:3.9')
+    api('org.jodd:jodd-util:6.1.0')
+    api('org.apache.commons:commons-lang3:3.12.0')
     api('org.apache.commons:commons-collections4:4.4')
-    api('commons-io:commons-io:2.6')
+    api('commons-io:commons-io:2.11.0')
 
     // Use JUnit test framework
-    testImplementation('junit:junit:4.12')
+    testImplementation(platform('org.junit:junit-bom:5.8.2'))
+    testImplementation('org.junit.jupiter:junit-jupiter')
     testImplementation("org.slf4j:jcl-over-slf4j:${slf4jVersion}")
-    testImplementation('ch.qos.logback:logback-classic:1.2.3')
+    testImplementation(platform('org.apache.logging.log4j:log4j-bom:2.17.2'))
+    testImplementation('org.apache.logging.log4j:log4j-slf4j-impl')
+    testImplementation('org.apache.logging.log4j:log4j-core')
 }
 
 
@@ -118,7 +114,7 @@ gradle.projectsEvaluated {
 test {
     dependsOn 'cleanTest'
 
-    useJUnit()
+    useJUnitPlatform()
     minHeapSize = "256m"
     maxHeapSize = "2G"
     testLogging.showStandardStreams = true

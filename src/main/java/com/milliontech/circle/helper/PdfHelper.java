@@ -25,7 +25,7 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Text;
-import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.splitting.BreakAllSplitCharacters;
 import com.milliontech.circle.constants.Constants;
 import com.milliontech.circle.constants.PaperSizeConstants;
@@ -37,9 +37,9 @@ import com.milliontech.circle.model.pdf.PdfStyle;
 
 
 public class PdfHelper {
-	
+
 	private static final Logger log = LoggerFactory.getLogger(PdfHelper.class);
-	
+
 	public static void createPdfHeaderCell(Table table, String text, PdfStyle style, TableHeader header, BorderType border, String align, Color color){
         PdfHelper.createPdfHeaderCell(table, text, style, header, border, align, color, 1, 1, null);
     }
@@ -100,10 +100,10 @@ public class PdfHelper {
         if(grey!=null){
             cell.setBackgroundColor(new DeviceGray(grey.floatValue()));
         }
-        
+
         cell.setPadding(2f);
         cell.setMinHeight(PdfConstants.DEFAULT_TABLE_CONTENT_FONT_SIZE);
-        
+
         if(isHeaderCell) {
             table.addHeaderCell(cell);
         } else {
@@ -198,7 +198,7 @@ public class PdfHelper {
 
 		return textValue;
 	}
-	
+
 	public static Paragraph createDisplayParagraph(String value, List<PdfFontInfo> fonts, boolean underLine, boolean breakAllSplit) {
         return PdfHelper.createDisplayParagraph(value, fonts, underLine, breakAllSplit, null);
     }
@@ -207,15 +207,15 @@ public class PdfHelper {
     	if (StringUtils.isBlank(value)) {
             return new Paragraph();
         }
-    	
+
     	Text t = new Text(value);
     	if(breakAllSplit) {
     		t.setSplitCharacters(new BreakAllSplitCharacters());
     	}
-    	
+
     	Paragraph p = new Paragraph(t);
     	p.setFontSize(fonts.get(0).getFontSize());
-    	
+
     	if(underLine) {
     		p = p.setUnderline(1, -3);
     	}
@@ -225,9 +225,9 @@ public class PdfHelper {
 
         return p;
     }
-    
+
     /* Replaced by FontProvider
-     * 
+     *
     private static Paragraph processText(String text, List<PdfFontInfo> fontInfos, boolean underline) {
         Paragraph p = new Paragraph();
         StringBuffer sb = new StringBuffer();
