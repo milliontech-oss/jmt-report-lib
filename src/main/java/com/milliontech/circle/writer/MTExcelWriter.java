@@ -146,7 +146,7 @@ public class MTExcelWriter implements MTWriter{
 			if(StringUtils.isBlank(tmpFilePath)){
 				synchronized(MTExcelWriter.class){
 					if(SXSSF_USER_TEMP_FILE_STRATEGY == null){
-						log.warn("No temp file path path provided. Using system property [java.io.tmpdir] = " + SXSSF_SYS_TEMP_FILE_STRATEGY.getTmpFilePath());
+						log.info("No temp file path path provided. Using system property [java.io.tmpdir] = " + SXSSF_SYS_TEMP_FILE_STRATEGY.getTmpFilePath());
 						SXSSF_USER_TEMP_FILE_STRATEGY = SXSSF_SYS_TEMP_FILE_STRATEGY;
 						TempFile.setTempFileCreationStrategy(SXSSF_USER_TEMP_FILE_STRATEGY);
 					}

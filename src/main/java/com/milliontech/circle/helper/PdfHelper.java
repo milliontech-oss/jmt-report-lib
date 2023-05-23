@@ -26,7 +26,7 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.TextAlignment;
-import com.itextpdf.layout.splitting.BreakAllSplitCharacters;
+import com.itextpdf.layout.splitting.KeepAllSplitCharacters;
 import com.milliontech.circle.constants.Constants;
 import com.milliontech.circle.constants.PaperSizeConstants;
 import com.milliontech.circle.constants.PdfConstants;
@@ -210,7 +210,7 @@ public class PdfHelper {
 
     	Text t = new Text(value);
     	if(breakAllSplit) {
-    		t.setSplitCharacters(new BreakAllSplitCharacters());
+            t.setSplitCharacters(new KeepAllSplitCharacters());
     	}
 
     	Paragraph p = new Paragraph(t);
