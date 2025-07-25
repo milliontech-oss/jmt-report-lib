@@ -1,11 +1,16 @@
 Report library for export to Excel and PDF
 ===============================================
 
+# End of life announcement
+Thise project will be retired and reached end of life by **Dec 2025**.
+
+This project would remain "as-is" and no further changes are anticpated.
+
+## Runtime dependencies
+
 Require at least Java 8
 
-
-Project timeline
-------------------------------------
+## Project timeline
 
 ### v5.1
 - Release date: 2022
